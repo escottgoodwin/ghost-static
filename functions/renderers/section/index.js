@@ -12,22 +12,21 @@ async function sectionGhostPage({ name, slug }){
 
   const sectionPage = templates.postsSection(name,posts,path);
   
-  uploader.writeHtml(filepath, sectionPage)
+  uploader.writeHtml(path, sectionPage)
 
-  uploader.uploadFile(filepath)
+  uploader.uploadFile(path)
 
 }
 
 function renderSearchPage(){
 
   const path = `search.html`;
-  const filepath = `/tmp/${path}`
 
   const searchPage = frameTemplate.renderSearchPage();
 
-  uploader.writeHtml(filepath, searchPage)
+  uploader.writeHtml(path, searchPage)
 
-  uploader.uploadFile(filepath)
+  uploader.uploadFile(path)
 
 }
 

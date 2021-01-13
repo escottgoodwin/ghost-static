@@ -40,7 +40,7 @@ async function indexPostTypesense(post){
     'path': path,
     'title': title,
     'authors': authorNames,
-    'primary_author': primary_author,
+    'primary_author': primary_author.name,
     'plaintext': plaintext,
     'tags': tagNames,
     'slug': slug,
@@ -70,7 +70,7 @@ async function updateIndexPostTypesense(post){
     plaintext,
     tags,
   } = post
-
+  console.log(post)
   const path = `${slug}-${id}`;
   const tagNames = tags.map(t => t.slug);
 

@@ -1,5 +1,5 @@
 const title = 'Static Times'
-const gh_cdn_url = 'https://cdn.jsdelivr.net/gh/escottgoodwin/slswp/assets/'
+const gh_cdn_url = 'https://cdn.jsdelivr.net/gh/escottgoodwin/ghost-static/assets/'
 const url = "https://www.evansgoodwin.com"
 const description = "News about the static world."
 const favicon = `${gh_cdn_url}favicon.png`

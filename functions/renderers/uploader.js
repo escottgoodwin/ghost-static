@@ -27,13 +27,13 @@ async function uploadFile(path) {
         contentType: "text/html; charset=utf-8",
         cacheControl: "max-age=30, s-maxage=31536000" // indef CDN cache since we purge manually
       },
-    });
+    })
     console.log(`${path} uploaded`)
     return await purgeUrl(path)
 }
 
 async function purgeUrl(path){
-  const purgeUrl = `${siteurl}/${path}`;
+  const purgeUrl = `${siteurl}${path}`;
   
   const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${zoneid}/purge_cache`
   const data = {files:[purgeUrl]};

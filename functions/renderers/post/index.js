@@ -47,10 +47,10 @@ async function renderUploadGhostPost(post){
 
   if(filepath && newDoc){
     //write render to temp storage
-    uploader.writeHtml(filepath, newDoc)
+    uploader.writeHtml(path, newDoc)
 
     //upload to storage 
-    uploader.uploadFile(filepath)
+    uploader.uploadFile(path)
   }
  
 }

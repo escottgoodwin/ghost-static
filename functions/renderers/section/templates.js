@@ -1,8 +1,8 @@
 const frameTemplate = require('../frame/templates');
 
 function postsSection(name, posts, alltags, path){
-    const postlist = posts.map(p => postLink(p)).join('')
-    const featuredPost1 = featuredPost(posts[0])
+    const postlist = posts.length>0 ? posts.map(p => postLink(p)).join('') : `<div></div>`
+    const featuredPost1 = posts.length>0 ? featuredPost(posts[0]) : `<div></div>`
     
     const template = `
         ${featuredPost1}
@@ -61,8 +61,6 @@ function featuredPost(post){
     </article>
     `
 }
-
-
 
 module.exports = { 
     postsSection,
