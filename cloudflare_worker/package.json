@@ -1,0 +1,16 @@
+{
+    "private": true,
+    "name": "static-times-demo",
+    "version": "1.0.0",
+    "description": "Demo of news site generated cloud functions trigged by a CMS",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "format": "prettier --write '**/*.{js,css,json,md}'"
+    },
+    "author": "Evan Goodwin",
+    "license": "MIT",
+    "devDependencies": {
+        "prettier": "^1.18.2"
+    }
+}
