@@ -17,6 +17,7 @@ let client = new Typesense.Client({
   'connectionTimeoutSeconds': 2
 });
 
+//indexes new post
 async function indexPostTypesense(post){
   const {
     title,
@@ -33,7 +34,7 @@ async function indexPostTypesense(post){
   const authorNames = authors.map(a => a.name);
   const tagNames = tags.map(t => t.slug);
   const pubTimestamp = moment(published_at).unix();
-  const pubDate = moment(post.post_date).format('MM-DD-YYYY');
+  const pubDate = moment(post.post_date).format('MMMM Do YYYY, h:mm a')
 
   let document = {
     'id':id,
@@ -52,7 +53,8 @@ async function indexPostTypesense(post){
 
   try {
 
-    result = await client.collections(collectionName).documents().create(document);
+    result = await client.collections(collectionName)
+    .documents().create(document);
     console.log(result)
 
   } catch (error) {
@@ -62,6 +64,7 @@ async function indexPostTypesense(post){
   }
 }
 
+//updates previously indexed post
 async function updateIndexPostTypesense(post){
   const {
     title,
@@ -70,13 +73,14 @@ async function updateIndexPostTypesense(post){
     plaintext,
     tags,
   } = post
-  console.log(post)
+
   const path = `${slug}-${id}`;
   const tagNames = tags.map(t => t.slug);
 
   try {
 
-    result = await client.collections(collectionName).documents(id).update({
+    result = await client.collections(collectionName)
+    .documents(id).update({
       'title': title,
       'content': plaintext,
       'tags': tagNames,
@@ -92,6 +96,7 @@ async function updateIndexPostTypesense(post){
   }
 }
 
+//deletes post
 async function deleteFromIndex(id){
     try {
       result = await client.collections(collectionName).documents(id).delete()

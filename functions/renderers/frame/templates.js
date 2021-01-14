@@ -6,6 +6,7 @@ const favicon = `${gh_cdn_url}favicon.png`
 const twitter = 'https://twitter.com/tryghost'
 const facebook = 'https://www.facebook.com/ghost'
 
+//site sections - listed on sidebar and has their own page with associated posts
 const tags = [
     {
         name:'Front Page',
@@ -25,10 +26,13 @@ const tags = [
     }
 ]
 
+//links on sidebar
 const pageLink = ({ slug, name }) => `<li class="nav-home active"><a href="${slug}.html">${name}</a></li>`
 
 const pagesMenu = pages => pages.map(p => pageLink(p)).join('')
 
+// sidebar, title and footer that frames the main content - post or section pages
+// includes links to css and javascript that are hosted on project github assets folder and served through jsdeliver
 function frame(content,path){
 
     const menu = pagesMenu(tags)
@@ -147,6 +151,9 @@ function frame(content,path){
     `
     }
 
+//renders search page that provides real time fulltext search through typsense
+//uses algolia's instantsearch library for the ui  
+//https://github.com/algolia/instantsearch.js/
 function renderSearchPage(){
 
     const menu = pagesMenu(tags)

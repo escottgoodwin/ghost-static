@@ -21,8 +21,8 @@ async function serveAsset(event) {
     //reassign response from the cache response to the response from google storage
     response = await fetch(fullurl)
 
-    //serve and cache response
-    const headers = { "cache-control": "public, max-age=300, s-maxage=31536000" }
+    //serve and cache response for a year
+    const headers = { "cache-control": "public, max-age=30, s-maxage=31536000" }
     response = new Response(response.body, { ...response, headers })
     event.waitUntil(cache.put(event.request, response.clone()))
   }

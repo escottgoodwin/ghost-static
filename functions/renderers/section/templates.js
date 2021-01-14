@@ -9,7 +9,9 @@ function postsSection(name, posts, alltags, path){
         <section>
 
             <header class="major">
-                <h2>${name}</h2>
+                <h2>
+                    ${name}
+                </h2>
             </header>
 
             <section class="posts">

@@ -9,8 +9,11 @@ const zoneid = functions.config().cloudflare.zoneid
 const bucketName = functions.config().bucket.name
 const siteurl = functions.config().site.url
 
+const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${zoneid}/purge_cache`
+
 const bucket = storage.bucket(bucketName)
 
+// writes to temporary file
 function writeHtml(path, newDoc){
   const filepath = `/tmp/${path}`
   fs.writeFile(filepath, newDoc, err => {
@@ -19,6 +22,10 @@ function writeHtml(path, newDoc){
   });
 }
 
+// uploads to google storage from temporary file and purges cloudflare cache
+// sets cache for 30 seconds and cloudflare cache for a year - 
+// all subsequent requests for url will come directly from the cache for the next year
+// until page is updated and cache is purged
 async function uploadFile(path) {
   const filepath = `/tmp/${path}`
     await bucket.upload(filepath, {
@@ -32,10 +39,10 @@ async function uploadFile(path) {
     return await purgeUrl(path)
 }
 
+// purges cloudflare cache with authenticated request for single url to allow updated page to load
 async function purgeUrl(path){
   const purgeUrl = `${siteurl}${path}`;
   
-  const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${zoneid}/purge_cache`
   const data = {files:[purgeUrl]};
   const response = await fetch(cloudframeurl, {
       body: JSON.stringify(data),
@@ -50,6 +57,7 @@ async function purgeUrl(path){
   return response
 }
 
+//deletes html file from google storage when unpublished and purges from cloudflare cache
 async function deleteHtml(path){
   const filename = path
   await bucket.file(filename).delete();

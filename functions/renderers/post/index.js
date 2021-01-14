@@ -5,6 +5,7 @@ const uploader = require('../uploader');
 const templates = require('./templates');
 const ghost = require('../../ghost');
 
+// renders post from post info with article template
 function createGhostPost(post){
 
   const {  
@@ -36,6 +37,7 @@ function createGhostPost(post){
 
 }
 
+// new rendered post is written to temporary storage and then upload to google storage
 async function renderUploadGhostPost(post){
   const t0 = Date.now();
   const { slug, id } = post
