@@ -3,14 +3,14 @@ const templates = require('./templates');
 const ghost = require('../../ghost');
 const frameTemplate = require('../frame/templates');
 
-async function sectionGhostPage({ name, slug }){
+async function renderGhostSectionPage({ name, slug }){
   const path = `${slug}.html`;
 
   //gets all posts where tag matches slug (for the section page) - limited to 5 articles per template layout
   const posts = await ghost.ghostApi.posts.browse({limit: 5, include: 'tags,authors', filter: 'tag:'+slug})
 
   //renders section page with all posts - business page with all business posts
-  const sectionPage = templates.postsSection(name,posts,path);
+  const sectionPage = templates.sectionTemplate({name,posts,path});
   
   //writes to temporary storage
   uploader.writeHtml(path, sectionPage)
@@ -37,5 +37,5 @@ function renderSearchPage(){
 
 module.exports = { 
   renderSearchPage,
-  sectionGhostPage,
+  renderGhostSectionPage,
 }

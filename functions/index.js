@@ -20,18 +20,16 @@ exports.deleteSchema = functions.https.onRequest(async (req, res) => {
 //when post is published in ghost, renders and uploads to new post page
 //rerenders the section page for each tag of the post
 exports.createGhostPost = functions.https.onRequest(async (req, res) => {
- 
-  const { current } = req.body.post
-
-  //render post page
-  await postRender.renderUploadGhostPost(current)
+  
+  const post = req.body.post
+  
+  await postRender.renderUploadGhostPost(post.current)
 
   // update section pages
-  const { tags } = current
-  tags.forEach(async tag => { await sectionRender.sectionGhostPage(tag) });
+  post.current.tags.forEach(async tag => { await sectionRender.renderGhostSectionPage(tag) });
     
   //creates typesense index entry for post
-  await ts.indexPostTypesense(current);
+  await ts.indexPostTypesense(post.current);
   
   res.status(200).send('doc created');
 });
@@ -40,17 +38,16 @@ exports.createGhostPost = functions.https.onRequest(async (req, res) => {
 //rerenders and uploads the section page for each tag of the post
 exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
 
-  const { current } = req.body.post
+  const post = req.body.post
 
   //render post page
-  await postRender.renderUploadGhostPost(current)
+  await postRender.renderUploadGhostPost(post.current);
 
   // update section pages with associated tags
-  const { tags } = current
-  tags.forEach(async tag => { await sectionRender.sectionGhostPage(tag) });
+  post.current.tags.forEach(async tag => { await sectionRender.renderGhostSectionPage(tag) });
     
   //index in typesense
-  await ts.updateIndexPostTypesense(current);
+  await ts.updateIndexPostTypesense(post.current);
 
   res.status(200).send('doc updated');
 });
@@ -59,14 +56,19 @@ exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
 //rerenders and uploads the section page for each tag of the post - page without the deleted article
 exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
 
-  const { slug, id, tags } = req.body.post.current
+  const post = req.body.post
+  const current = post.current
+
+  const slug = current.slug
+  const id = current.id
+  const tags = current.tags
   const path = `${slug}-${id}.html`;
 
   //delete article in storage
   await uploader.deleteHtml(path);
 
   // update section pages with associated tags removing the article
-  tags.forEach(async tag => { await sectionRender.sectionGhostPage(tag) });
+  tags.forEach(async tag => { await sectionRender.renderGhostSectionPage(tag) });
 
   //remove from typesense index
   await ts.deleteFromIndex(id);

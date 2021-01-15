@@ -1,6 +1,6 @@
 const frametempate = require('../frame/templates');
 
-function articlePage({ 
+function postTemplate({ 
     html, 
     title, 
     feature_image, 
@@ -10,7 +10,10 @@ function articlePage({
     primary_author,
     path
 }){
-    const { name, profile_image } = primary_author
+    
+    const name = primary_author.name
+    const profile_image = primary_author.profile_image
+
 
     const article =`
     <section>
@@ -51,5 +54,5 @@ function articlePage({
 }
 
 module.exports = { 
-    articlePage,
+    postTemplate,
 }

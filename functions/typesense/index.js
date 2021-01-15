@@ -4,7 +4,7 @@ const Typesense = require('typesense');
 
 const typesenseHost = functions.config().typesense.host
 const typesenseApiKey= functions.config().typesense.apikey
-const collectionName = 'ghost_posts'
+const collectionName = functions.config().typesense.collectionname
 
 let client = new Typesense.Client({
   'nodes': [{
@@ -19,22 +19,20 @@ let client = new Typesense.Client({
 
 //indexes new post
 async function indexPostTypesense(post){
-  const {
-    title,
-    slug,
-    id,
-    plaintext,
-    primary_author,
-    authors,
-    tags,
-    published_at,
-  } = post
+
+  const plaintext = post.plaintext
+  const title = post.title 
+  const published_at = post.published_at 
+  const authors = post.authors
+  const slug = post.slug
+  const id = post.id
+  const primary_author = post.primary_author
 
   const path = `${slug}-${id}`;
   const authorNames = authors.map(a => a.name);
-  const tagNames = tags.map(t => t.slug);
+  const tagNames = post.tags.map(t => t.slug);
   const pubTimestamp = moment(published_at).unix();
-  const pubDate = moment(post.post_date).format('MMMM Do YYYY, h:mm a')
+  const pubDate = moment(published_at).format('MMMM Do YYYY, h:mm a')
 
   let document = {
     'id':id,
@@ -53,29 +51,26 @@ async function indexPostTypesense(post){
 
   try {
 
-    result = await client.collections(collectionName)
-    .documents().create(document);
-    console.log(result)
+    result = await client.collections(collectionName).documents().create(document);
+    console.log(`${title} indexed`)
 
   } catch (error) {
 
-    console.log('created',error);
+    console.log('index created',error);
 
   }
 }
 
 //updates previously indexed post
 async function updateIndexPostTypesense(post){
-  const {
-    title,
-    slug,
-    id,
-    plaintext,
-    tags,
-  } = post
+
+  const plaintext = post.plaintext
+  const title = post.title 
+  const slug = post.slug
+  const id = post.id
 
   const path = `${slug}-${id}`;
-  const tagNames = tags.map(t => t.slug);
+  const tagNames = post.tags.map(t => t.slug);
 
   try {
 
@@ -89,10 +84,10 @@ async function updateIndexPostTypesense(post){
       'path': path,
     })
 
-    console.log(result)
+    console.log(`${title} index updated`);
 
   } catch (error) {
-    console.log('updated',error);
+    console.log(`index updated error`,error);
   }
 }
 
@@ -100,9 +95,9 @@ async function updateIndexPostTypesense(post){
 async function deleteFromIndex(id){
     try {
       result = await client.collections(collectionName).documents(id).delete()
-
+      console.log(`${id} index deleted`);
       } catch (error) {
-      console.log('updated',error);
+        console.log(`index delete error`,error);
     }
 }
 
@@ -125,6 +120,7 @@ async function createSchema(){
     ],
     'default_sorting_field': 'published_timestamp'
   }
+
   const data = await client.collections().create(postsSchema)
 
   return data

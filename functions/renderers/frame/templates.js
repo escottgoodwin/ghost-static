@@ -159,7 +159,6 @@ function renderSearchPage(){
     const menu = pagesMenu(tags)
 
     const content = `
-
     <!DOCTYPE html>
     <html lang="en">
     <head>

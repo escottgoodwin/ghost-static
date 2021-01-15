@@ -5,11 +5,12 @@ const { Storage } = require('@google-cloud/storage');
 const storage = new Storage();
 
 const cfAuthKey = functions.config().cloudflare.authkey
-const zoneid = functions.config().cloudflare.zoneid
+const cfZoneId = functions.config().cloudflare.zoneid
+const cfEmail = functions.config().cloudflare.email
 const bucketName = functions.config().bucket.name
-const siteurl = functions.config().site.url
+const siteUrl = functions.config().site.url
 
-const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${zoneid}/purge_cache`
+const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`
 
 const bucket = storage.bucket(bucketName)
 
@@ -41,14 +42,19 @@ async function uploadFile(path) {
 
 // purges cloudflare cache with authenticated request for single url to allow updated page to load
 async function purgeUrl(path){
-  const purgeUrl = `${siteurl}${path}`;
-  
-  const data = {files:[purgeUrl]};
+  const purgeUrl = `${siteUrl}${path}`;
+
+  //if front page is rerendered, purge site root address as well
+  const files  = path === 'front-page.html' ? [purgeUrl,siteUrl] : [purgeUrl]
+
+  const data = {files};
+
+  //purge cache request
   const response = await fetch(cloudframeurl, {
       body: JSON.stringify(data),
       headers: {
           "Content-Type": "application/json",
-          "X-Auth-Email": "evansgoodwin@gmail.com",
+          "X-Auth-Email": cfEmail,
           "X-Auth-Key": cfAuthKey
           },
       method: "POST"
