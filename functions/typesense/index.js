@@ -4,7 +4,7 @@ const Typesense = require('typesense');
 
 const typesenseHost = functions.config().typesense.host
 const typesenseApiKey= functions.config().typesense.apikey
-const collectionName = functions.config().typesense.collectionname
+const collectionName =  functions.config().typesense.collectionname //'ghost_posts_local'
 
 let client = new Typesense.Client({
   'nodes': [{
@@ -20,13 +20,15 @@ let client = new Typesense.Client({
 //indexes new post
 async function indexPostTypesense(post){
 
-  const plaintext = post.plaintext
-  const title = post.title 
-  const published_at = post.published_at 
-  const authors = post.authors
-  const slug = post.slug
-  const id = post.id
-  const primary_author = post.primary_author
+  const { 
+    plaintext,
+    title,
+    published_at,
+    authors,
+    slug,
+    id,
+    primary_author
+  } = post 
 
   const path = `${slug}-${id}`;
   const authorNames = authors.map(a => a.name);
@@ -64,10 +66,12 @@ async function indexPostTypesense(post){
 //updates previously indexed post
 async function updateIndexPostTypesense(post){
 
-  const plaintext = post.plaintext
-  const title = post.title 
-  const slug = post.slug
-  const id = post.id
+  const { 
+    plaintext,
+    title,
+    slug,
+    id,
+  } = post 
 
   const path = `${slug}-${id}`;
   const tagNames = post.tags.map(t => t.slug);
@@ -103,7 +107,7 @@ async function deleteFromIndex(id){
 
 async function createSchema(){
   let postsSchema = {
-    'name': 'ghost_posts',
+    'name': collectionName,
     'fields': [
       {'name': 'id', 'type': 'string' },
       {'name': 'title', 'type': 'string' },
@@ -129,7 +133,6 @@ async function createSchema(){
 
 async function deleteSchema(){
   const result = await client.collections(collectionName).delete()
-  console.log(result)
   return result 
 }
 

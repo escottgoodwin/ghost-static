@@ -7,7 +7,7 @@ const storage = new Storage();
 const cfAuthKey = functions.config().cloudflare.authkey
 const cfZoneId = functions.config().cloudflare.zoneid
 const cfEmail = functions.config().cloudflare.email
-const bucketName = functions.config().bucket.name
+const bucketName = functions.config().bucket.name // 'static_times'
 const siteUrl = functions.config().site.url
 
 const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`
@@ -29,6 +29,7 @@ function writeHtml(path, newDoc){
 // until page is updated and cache is purged
 async function uploadFile(path) {
   const filepath = `/tmp/${path}`
+  try{
     await bucket.upload(filepath, {
       gzip: true,
       metadata: {
@@ -36,8 +37,12 @@ async function uploadFile(path) {
         cacheControl: "max-age=30, s-maxage=31536000" // indef CDN cache since we purge manually
       },
     })
+
     console.log(`${path} uploaded`)
     return await purgeUrl(path)
+  } catch(error){
+    console.log(error)
+  }
 }
 
 // purges cloudflare cache with authenticated request for single url to allow updated page to load

@@ -21,15 +21,23 @@ exports.deleteSchema = functions.https.onRequest(async (req, res) => {
 //rerenders the section page for each tag of the post
 exports.createGhostPost = functions.https.onRequest(async (req, res) => {
   
-  const post = req.body.post
-  
-  await postRender.renderUploadGhostPost(post.current)
+  const { 
+    body: {
+      post: {
+        current 
+      }, 
+    }, 
+  } = req; 
+
+  await postRender.renderUploadGhostPost(current);
+   
+  await sectionRender.renderGhostAuthorPage(current.primary_author);
 
   // update section pages
-  post.current.tags.forEach(async tag => { await sectionRender.renderGhostSectionPage(tag) });
+  current.tags.forEach(async tag => { sectionRender.renderGhostSectionPage(tag) });
     
   //creates typesense index entry for post
-  await ts.indexPostTypesense(post.current);
+  await ts.indexPostTypesense(current);
   
   res.status(200).send('doc created');
 });
@@ -37,17 +45,27 @@ exports.createGhostPost = functions.https.onRequest(async (req, res) => {
 //when post is published post in ghost is updated, renders and uploads the new post page to google storage
 //rerenders and uploads the section page for each tag of the post
 exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
+  
+  const { 
+    body: {
+      post: {
+        current 
+      }, 
+    }, 
+  } = req; 
 
-  const post = req.body.post
-
+  if(current){
   //render post page
-  await postRender.renderUploadGhostPost(post.current);
+  await postRender.renderUploadGhostPost(current);
 
-  // update section pages with associated tags
-  post.current.tags.forEach(async tag => { await sectionRender.renderGhostSectionPage(tag) });
+  await sectionRender.renderGhostAuthorPage(current.primary_author);
+
+  //update section pages with associated tags
+  current.tags.forEach(tag => { sectionRender.renderGhostSectionPage(tag) })
     
   //index in typesense
-  await ts.updateIndexPostTypesense(post.current);
+  await ts.updateIndexPostTypesense(current);
+  }
 
   res.status(200).send('doc updated');
 });
@@ -56,8 +74,13 @@ exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
 //rerenders and uploads the section page for each tag of the post - page without the deleted article
 exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
 
-  const post = req.body.post
-  const current = post.current
+  const { 
+    body: {
+      post: {
+        current 
+      }, 
+    }, 
+  } = req; 
 
   const slug = current.slug
   const id = current.id

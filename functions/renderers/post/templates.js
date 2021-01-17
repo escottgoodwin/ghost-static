@@ -11,9 +11,11 @@ function postTemplate({
     path
 }){
     
-    const name = primary_author.name
-    const profile_image = primary_author.profile_image
-
+    const { 
+        name, 
+        slug, 
+        profile_image 
+    } = primary_author
 
     const article =`
     <section>
@@ -28,7 +30,9 @@ function postTemplate({
             </p>
         </header>
 
-        <div class="image main"><img src="${feature_image}" alt="Welcome to Ghost" /></div>
+        <div class="image main">
+            <img src="${feature_image}" alt="${title}" />
+        </div>
 
         <div class="content">
             ${html}
@@ -37,11 +41,15 @@ function postTemplate({
         <footer class="post-footer">
 
             <div class="authors">
-                <a class="author-box" href="/author/ghost/">
+                <a class="author-box" href="${slug}.html">
                     <img class="author-profile-image" src="${profile_image}" alt="Ghost" />
                     <section class="author-box-content">
-                        <div class="author-box-label">Author</div>
-                        <h5 class="author-box-name">${name}</h5>
+                        <div class="author-box-label">
+                            Author
+                        </div>
+                        <h5 class="author-box-name">
+                            ${name}
+                        </h5>
                     </section>
                 </a>
             </div>

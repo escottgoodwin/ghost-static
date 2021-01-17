@@ -6,14 +6,16 @@ const templates = require('./templates');
 // renders post from post info with article template
 function renderGhostPost(post){
 
-  const html = post.html 
-  const title = post.title 
-  const feature_image = post.feature_image 
-  const excerpt = post.excerpt
-  const published_at = post.published_at 
-  const slug = post.slug
-  const id = post.id
-  const primary_author = post.primary_author
+  const { 
+    html,
+    title,
+    feature_image,
+    excerpt,
+    published_at,
+    slug,
+    id,
+    primary_author
+  } = post 
 
   const path = `${slug}-${id}.html`
   const pubDate = moment(published_at).format('MMMM Do YYYY, h:mm a')
@@ -33,8 +35,7 @@ function renderGhostPost(post){
 // new rendered post is written to temporary storage and then upload to google storage
 async function renderUploadGhostPost(post){
   const t0 = Date.now();
-  const slug = post.slug;
-  const id = post.id;
+  const { slug, id } = post;
   const path = `${slug}-${id}.html`;
   const filepath = `/tmp/${path}`;
 

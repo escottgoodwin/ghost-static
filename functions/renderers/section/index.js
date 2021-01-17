@@ -20,6 +20,24 @@ async function renderGhostSectionPage({ name, slug }){
 
 }
 
+async function renderGhostAuthorPage({ name, slug, profile_image }){
+
+  const path = `${slug}.html`;
+
+  //gets all posts where tag matches slug (for the section page) - limited to 5 articles per template layout
+  const posts = await ghost.ghostApi.posts.browse({limit: 5, include: 'tags,authors', filter: 'primary_author:'+slug})
+
+  //renders section page with all posts - business page with all business posts
+  const sectionPage = templates.authorTemplate({ name, profile_image, posts, path });
+  
+  //writes to temporary storage
+  uploader.writeHtml(path, sectionPage)
+
+  //uploads from temporary storage
+  uploader.uploadFile(path)
+
+}
+
 function renderSearchPage(){
 
   const path = `search.html`;
@@ -36,6 +54,7 @@ function renderSearchPage(){
 }
 
 module.exports = { 
-  renderSearchPage,
   renderGhostSectionPage,
+  renderGhostAuthorPage,
+  renderSearchPage,
 }
