@@ -2,9 +2,11 @@ const functions = require('firebase-functions');
 var moment = require('moment');
 const Typesense = require('typesense');
 
+const local = process.env.FUNCTIONS_EMULATOR
+
 const typesenseHost = functions.config().typesense.host
 const typesenseApiKey= functions.config().typesense.apikey
-const collectionName =  functions.config().typesense.collectionname //'ghost_posts_local'
+const collectionName = local ? 'ghost_posts_local' : functions.config().typesense.collectionname 
 
 let client = new Typesense.Client({
   'nodes': [{

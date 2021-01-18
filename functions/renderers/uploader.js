@@ -4,11 +4,12 @@ const fs = require('fs');
 const { Storage } = require('@google-cloud/storage');
 const storage = new Storage();
 
+const local = process.env.FUNCTIONS_EMULATOR
 const cfAuthKey = functions.config().cloudflare.authkey
 const cfZoneId = functions.config().cloudflare.zoneid
 const cfEmail = functions.config().cloudflare.email
-const bucketName = functions.config().bucket.name // 'static_times'
-const siteUrl = functions.config().site.url
+const bucketName = local ? 'static_times' : functions.config().bucket.name 
+const siteUrl = functions.config().cdn.url
 
 const cloudframeurl =  `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`
 
