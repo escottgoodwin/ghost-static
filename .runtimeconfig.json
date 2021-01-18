@@ -1,0 +1,33 @@
+{
+  "bucket": {
+    "name": "static-times"
+  },
+  "ghost": {
+    "url": "https://ghost-gcs-static-v26nfpfxqq-uc.a.run.app",
+    "apikey": "7c3c768b0d4476707536a6b83a"
+  },
+  "typesense": {
+    "collectionname": "ghost_posts",
+    "apikey": "JcWx2J2nq3vZYMHRY5LYAcHN4lpRTfNJ",
+    "host": "u7c0pfjloi4wv8zdp-1.a1.typesense.net"
+  },
+  "db": {
+    "port": "17599",
+    "host": "mysql-17599-0.cloudclusters.net",
+    "password": "Royallord84@",
+    "user": "ymroddi",
+    "name": "wp5"
+  },
+  "site": {
+    "url": "https://www.evansgoodwin.com/"
+  },
+  "cdn": {
+    "url": "https://evansgoodwin.com/"
+  },
+  "cloudflare": {
+    "domain": "https://evansgoodwin.com/",
+    "zoneid": "0a8a64d36e7866c5da77c9aafcfb86ae",
+    "email": "evansgoodwin@gmail.com",
+    "authkey": "4f362889f6129d02e885fa78735914d12293c"
+  }
+}
