@@ -1,39 +1,33 @@
 {
-  "typesense": {
-    "host": "u7c0pfjloi4wv8zdp-1.a1.typesense.net",
-    "collectionname": "ghost_posts",
-    "apikey": "JcWx2J2nq3vZYMHRY5LYAcHN4lpRTfNJ"
-  },
-  "ghost": {
-    "api": "a48a3489c581a95ef029e99ab1",
-    "url": "https://ghost-gcs-static-v26nfpfxqq-uc.a.run.app",
-    "apikey": "7c3c768b0d4476707536a6b83a"
-  },
-  "site": {
-    "url": "https://www.evansgoodwin.com/",
-    "environment": "production"
-  },
-  "bucket": {
-    "name": "static-times"
+  "db": {
+    "name": "wp5",
+    "user": "ymroddi",
+    "password": "Royallord84@",
+    "port": "17599",
+    "host": "mysql-17599-0.cloudclusters.net"
   },
   "cdn": {
     "url": "https://evansgoodwin.com/"
   },
-  "sandlanding": {
-    "hubspotapi": "40b3c097-0355-491b-a71a-0aa1c89d4966",
-    "sgapi": "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"
+  "typesense": {
+    "collectionname": "ghost_posts",
+    "apikey": "JcWx2J2nq3vZYMHRY5LYAcHN4lpRTfNJ",
+    "host": "u7c0pfjloi4wv8zdp-1.a1.typesense.net"
   },
-  "db": {
-    "user": "ymroddi",
-    "password": "Royallord84@",
-    "port": "17599",
-    "host": "mysql-17599-0.cloudclusters.net",
-    "name": "wp5"
+  "ghost": {
+    "url": "https://ghost-gcs-static-v26nfpfxqq-uc.a.run.app",
+    "apikey": "7c3c768b0d4476707536a6b83a"
   },
   "cloudflare": {
-    "authkey": "4f362889f6129d02e885fa78735914d12293c",
     "email": "evansgoodwin@gmail.com",
+    "zoneid": "0a8a64d36e7866c5da77c9aafcfb86ae",
     "domain": "https://evansgoodwin.com/",
-    "zoneid": "0a8a64d36e7866c5da77c9aafcfb86ae"
+    "authkey": "4f362889f6129d02e885fa78735914d12293c"
+  },
+  "site": {
+    "url": "https://www.evansgoodwin.com/"
+  },
+  "bucket": {
+    "name": "static-times"
   }
 }
