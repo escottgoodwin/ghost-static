@@ -1,3 +1,11 @@
+# docker build -t CONTAINER_NAME .
+# docker tag CONTAINER_NAME gcr.io/GCS_PROJECT_NAME/CONTAINER_NAME
+# docker push gcr.io/GCS_PROJECT_NAME/CONTAINER_NAME
+# In Cloud Run, create new service and choose CONTAINER_NAME image
+# example
+# docker build -t ghost-static .
+# docker tag ghost-static gcr.io/ghost-firebase/ghost-static
+# docker push gcr.io/ghost-firebase/ghost-static
 FROM ghost:3.40.5
 
 WORKDIR /var/lib/ghost
