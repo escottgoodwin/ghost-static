@@ -2,7 +2,7 @@ const functions = require("firebase-functions");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const {Storage} = require("@google-cloud/storage");
-const fbstorage = require("../firebase");
+const fb = require("../firebase");
 const storage = new Storage();
 
 const local = process.env.FUNCTIONS_EMULATOR;
@@ -15,6 +15,19 @@ const siteUrl = functions.config().cdn.url;
 const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`;
 
 const bucket = storage.bucket(bucketName);
+
+// update realtime database
+const updateFirebase = (name, email, fileName) => {
+  console.log(`updating preview ${fileName} by ${email}`);
+  current_user = email.replace('@','_at_').replace('.','_')
+  const now = Date.now();
+
+  fb.db.ref(current_user).set({
+    url: fileName,
+    edited_by: name,
+    timestamp: now.toString(),
+  });
+};
 
 // writes to temporary file
 const writeHtml = (path, newDoc) => {
@@ -47,15 +60,19 @@ const uploadFile = async (path) => {
   }
 };
 
-const uploadDraft = async (path, doc) => {
-  await fbstorage.bucket()
-      .file(path)
+const uploadDraft = async (path, doc, name, email) => {
+  fb.fbstorage.bucket()
+      .file(`drafts/${path}`)
       .save(doc, {
         gzip: true,
         metadata: {
           contentType: "text/html; charset=utf-8",
         },
-      });
+      }).then(res => {
+        updateFirebase(name, email, path)
+      }).catch(e => {
+        console.log(e)
+      })
 };
 
 // purges cloudflare cache with authenticated request for single url to allow updated page to load

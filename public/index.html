@@ -135,6 +135,7 @@ limitations under the License.
     function initApp() {
       // Listening for auth state changes.
       document.getElementById('quickstart-sign-in').textContent = 'Sign in';
+      firebase.auth().useEmulator('http://localhost:9099/');
       firebase.auth().onAuthStateChanged(user => {
        
         if (user) {
@@ -181,7 +182,7 @@ limitations under the License.
           <h2 class="mdl-card__title-text">Authentication</h2>
         </div>
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-          <p>Enter an email and password below and either sign in to an existing account or sign up</p>
+          <p>Enter the email associated with your ghost account and password below and either sign in to an existing account or sign up</p>
 
           <input class="mdl-textfield__input" style="display:inline;width:auto;" type="text" id="email" name="email" placeholder="Email"/>
           &nbsp;&nbsp;&nbsp;

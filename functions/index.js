@@ -4,18 +4,6 @@ const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
 const uploader = require("./renderers/uploader");
 const ts = require("./typesense");
-const fb = require("./firebase");
-
-// update realtime database
-const updateFirebase = (email, fileName) => {
-  console.log(`updating ${fileName} by ${email}`);
-  const now = Date.now();
-  fb.db.ref(email).set({
-    url: fileName,
-    edited_by: "",
-    timestamp: Date.parse(now),
-  });
-};
 
 // creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {
@@ -45,15 +33,9 @@ exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
     },
   } = req;
 
-  console.log(current);
+  postRender.renderUploadGhostDraft(current);
 
-  const path = `${current.slug}-${current.id}.html`;
-  const email = current.primary_author.email;
-  await postRender.renderUploadGhostDraft(current);
-
-  updateFirebase(email, path);
-
-  res.status(200).send("draft created");
+  res.status(200).send("draft updated");
 });
 
 // fires on saved draft, triggers preview update
@@ -66,12 +48,7 @@ exports.updateGhostDraft = functions.https.onRequest(async (req, res) => {
     },
   } = req;
 
-  console.log(current);
-
-  const path = `${current.slug}-${current.id}.html`;
-  const email = current.primary_author.email;
-  await postRender.renderUploadGhostDraft(current);
-  updateFirebase(email, path);
+  postRender.renderUploadGhostDraft(current);
 
   res.status(200).send("draft updated");
 });
