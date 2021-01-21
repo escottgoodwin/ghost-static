@@ -1,23 +1,23 @@
-const frametempate = require('../frame/templates');
+const frametempate = require("../frame/templates");
 
-function postTemplate({ 
-    html, 
-    title, 
-    feature_image, 
-    pubDate, 
-    excerpt,
-    alltags,
-    primary_author,
-    path
-}){
-    
-    const { 
-        name, 
-        slug, 
-        profile_image 
-    } = primary_author
+// create post
+const postTemplate = ({
+  html,
+  title,
+  feature_image,
+  pubDate,
+  excerpt,
+  alltags,
+  primary_author,
+  path,
+}) => {
+  const {
+    name,
+    slug,
+    profile_image,
+  } = primary_author;
 
-    const article =`
+  const article =`
     <section>
 
         <header class="main content">
@@ -56,11 +56,11 @@ function postTemplate({
 
         </footer>
 
-    </section>`
+    </section>`;
 
-    return frametempate.frame(article,alltags,path)
-}
+  return frametempate.frame(article, alltags, path);
+};
 
-module.exports = { 
-    postTemplate,
-}
+module.exports = {
+  postTemplate,
+};

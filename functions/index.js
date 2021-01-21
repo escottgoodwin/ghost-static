@@ -1,106 +1,178 @@
-const functions = require('firebase-functions');
+const functions = require("firebase-functions");
 
-const postRender=require('./renderers/post');
-const sectionRender=require('./renderers/section');
-const uploader = require('./renderers/uploader');
-const ts = require('./typesense');
+const postRender=require("./renderers/post");
+const sectionRender=require("./renderers/section");
+const uploader = require("./renderers/uploader");
+const ts = require("./typesense");
+const fb = require("./firebase");
 
-//creates predefined typesense schema
+// update realtime database
+const updateFirebase = (email, fileName) => {
+  console.log(`updating ${fileName} by ${email}`);
+  const now = Date.now();
+  fb.db.ref(email).set({
+    url: fileName,
+    edited_by: "",
+    timestamp: Date.parse(now),
+  });
+};
+
+// creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {
-    const data = await ts.createSchema()
-    res.status(200).send(JSON.stringify(data));
+  const data = await ts.createSchema();
+  res.status(200).send(JSON.stringify(data));
 });
 
-//deletes typesense schema
+// creates predefined typesense schema
+exports.createSchema = functions.https.onRequest(async (req, res) => {
+  const data = await ts.createSchema();
+  res.status(200).send(JSON.stringify(data));
+});
+
+// deletes typesense schema
 exports.deleteSchema = functions.https.onRequest(async (req, res) => {
-  const result = await ts.deleteSchema()
+  const result = await ts.deleteSchema();
   res.status(200).send(result);
 });
 
-//when post is published in ghost, renders and uploads to new post page
-//rerenders the section page for each tag of the post
-exports.createGhostPost = functions.https.onRequest(async (req, res) => {
-  
-  const { 
+// fires on saved draft, triggers preview update
+exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
+  const {
     body: {
       post: {
-        current 
-      }, 
-    }, 
-  } = req; 
+        current,
+      },
+    },
+  } = req;
 
-  await postRender.renderUploadGhostPost(current);
-   
-  await sectionRender.renderGhostAuthorPage(current.primary_author);
+  console.log(current);
 
-  // update section pages
-  current.tags.forEach(async tag => { sectionRender.renderGhostSectionPage(tag) });
-    
-  //creates typesense index entry for post
-  await ts.indexPostTypesense(current);
-  
-  res.status(200).send('doc created');
+  const path = `${current.slug}-${current.id}.html`;
+  const email = current.primary_author.email;
+  await postRender.renderUploadGhostDraft(current);
+
+  updateFirebase(email, path);
+
+  res.status(200).send("draft created");
 });
 
-//when post is published post in ghost is updated, renders and uploads the new post page to google storage
-//rerenders and uploads the section page for each tag of the post
-exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
-  
-  const { 
+// fires on saved draft, triggers preview update
+exports.updateGhostDraft = functions.https.onRequest(async (req, res) => {
+  const {
     body: {
       post: {
-        current 
-      }, 
-    }, 
-  } = req; 
+        current,
+      },
+    },
+  } = req;
 
-  if(current){
-  //render post page
+  console.log(current);
+
+  const path = `${current.slug}-${current.id}.html`;
+  const email = current.primary_author.email;
+  await postRender.renderUploadGhostDraft(current);
+  updateFirebase(email, path);
+
+  res.status(200).send("draft updated");
+});
+
+// when post is published in ghost, renders and uploads to new post page
+// rerenders the section page for each tag of the post
+exports.createGhostPost = functions.https.onRequest(async (req, res) => {
+  const {
+    body: {
+      post: {
+        current,
+      },
+    },
+  } = req;
+
+  const path = `${current.slug}-${current.id}.html`;
+
   await postRender.renderUploadGhostPost(current);
 
   await sectionRender.renderGhostAuthorPage(current.primary_author);
 
-  //update section pages with associated tags
-  current.tags.forEach(tag => { sectionRender.renderGhostSectionPage(tag) })
-    
-  //index in typesense
-  await ts.updateIndexPostTypesense(current);
+  current.authors.forEach(async (author) => {
+    updateFirebase(author.email, path);
+  });
+  // update section pages
+  current.tags.forEach(async (tag) => {
+    sectionRender.renderGhostSectionPage(tag);
+  });
+
+  // creates typesense index entry for post
+  await ts.indexPostTypesense(current);
+
+  res.status(200).send("doc created");
+});
+
+// when post is published post in ghost is updated, renders and uploads the new post page to google storage
+// rerenders and uploads the section page for each tag of the post
+exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
+  const {
+    body: {
+      post: {
+        current,
+      },
+    },
+  } = req;
+
+  if (current) {
+  // render post page
+    await postRender.renderUploadGhostPost(current);
+
+    const path = `${current.slug}-${current.id}.html`;
+    current.authors.forEach(async (author) => {
+      updateFirebase(author.email, path);
+    });
+
+    await sectionRender.renderGhostAuthorPage(current.primary_author);
+
+    // update section pages with associated tags
+    current.tags.forEach((tag) => {
+      sectionRender.renderGhostSectionPage(tag);
+    });
+
+    // index in typesense
+    await ts.updateIndexPostTypesense(current);
   }
 
-  res.status(200).send('doc updated');
+  res.status(200).send("doc updated");
 });
 
-//when post is unpublished in ghost, post page is deleted from google storage
-//rerenders and uploads the section page for each tag of the post - page without the deleted article
+// when post is unpublished in ghost, post page is deleted from google storage
+// rerenders and uploads the section page for each tag of the post - page without the deleted article
 exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
-
-  const { 
+  const {
     body: {
       post: {
-        current 
-      }, 
-    }, 
-  } = req; 
+        current,
+      },
+    },
+  } = req;
 
-  const slug = current.slug
-  const id = current.id
-  const tags = current.tags
+  const slug = current.slug;
+  const id = current.id;
+  const tags = current.tags;
   const path = `${slug}-${id}.html`;
 
-  //delete article in storage
+  // delete article in storage
   await uploader.deleteHtml(path);
 
   // update section pages with associated tags removing the article
-  tags.forEach(async tag => { await sectionRender.renderGhostSectionPage(tag) });
+  tags.forEach(async (tag) => {
+    await sectionRender.renderGhostSectionPage(tag);
+  });
 
-  //remove from typesense index
+  // remove from typesense index
   await ts.deleteFromIndex(id);
 
-  res.status(200).send('post deleted');
+  res.status(200).send("post deleted");
 });
 
-///renders typesense search page
+// /renders typesense search page
 exports.renderSearchPage = functions.https.onRequest(async (req, res) => {
-    sectionRender.renderSearchPage()
-    res.status(200).send('search page');
+  sectionRender.renderSearchPage();
+  res.status(200).send("search page");
 });

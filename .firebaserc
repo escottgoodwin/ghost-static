@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "phototasker-7d477"
+  },
+  "targets": {
+    "phototasker-7d477": {
+      "hosting": {
+        "ghost-static": [
+          "ghost-static"
+        ]
+      }
+    }
   }
 }

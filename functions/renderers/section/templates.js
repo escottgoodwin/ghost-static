@@ -1,16 +1,17 @@
-const frameTemplate = require('../frame/templates');
+const frameTemplate = require("../frame/templates");
 
-function authorTemplate({ 
-    name, 
-    profile_image, 
-    posts, 
-    path
- }){
-    const postlist = posts.length>0 ? posts.map(p => postLink(p)).join('') : `<div></div>`
-   
-    const postCount = posts.length === 1 ? `${posts.length} post` : `${posts.length} posts`
+// generate author
+const authorTemplate = ({
+  name,
+  profile_image,
+  posts,
+  path,
+}) => {
+  const postlist = posts.length>0 ? posts.map((p) => postLink(p)).join("") : "<div></div>";
 
-    const template = `
+  const postCount = posts.length === 1 ? `${posts.length} post` : `${posts.length} posts`;
+
+  const template = `
         <header class="author-header">
             <img class="author-profile-image" src="${profile_image}" alt="${name}" />
             <h1>
@@ -33,21 +34,21 @@ function authorTemplate({
         <footer>
             
         </footer>
-    `
+    `;
 
-    return frameTemplate.frame(template, path)
-}
+  return frameTemplate.frame(template, path);
+};
 
+// generate section
+const sectionTemplate = ({
+  name,
+  posts,
+  path,
+}) => {
+  const postlist = posts.length>0 ? posts.slice(1).map((p) => postLink(p)).join("") : "<div></div>";
+  const featuredPost1 = posts.length>0 ? featuredPost(posts[0]) : "<div></div>";
 
-function sectionTemplate({ 
-    name, 
-    posts, 
-    path
- }){
-    const postlist = posts.length>0 ? posts.slice(1).map(p => postLink(p)).join('') : `<div></div>`
-    const featuredPost1 = posts.length>0 ? featuredPost(posts[0]) : `<div></div>`
-    
-    const template = `
+  const template = `
         ${featuredPost1}
         <section>
 
@@ -65,14 +66,15 @@ function sectionTemplate({
         <footer>
             
         </footer>
-    `
+    `;
 
-    return frameTemplate.frame(template, path)
-}
+  return frameTemplate.frame(template, path);
+};
 
-function postLink({ slug, id, title, excerpt, feature_image }){
-    const url = `${slug}-${id}.html`
-    return `
+// generate link
+const postLink = ({slug, id, title, excerpt, feature_image}) => {
+  const url = `${slug}-${id}.html`;
+  return `
         <article>
             <a href="${url}" class="image fit">
                 <img src="${feature_image}" alt="Welcome to Ghost" />
@@ -93,12 +95,13 @@ function postLink({ slug, id, title, excerpt, feature_image }){
                 </li>
             </ul>
         </article>
-    `
-}
+    `;
+};
 
-function featuredPost({ slug, id, title, excerpt, feature_image }){
-    const url = `${slug}-${id}.html`
-    return `
+// generate post
+const featuredPost = ({slug, id, title, excerpt, feature_image}) => {
+  const url = `${slug}-${id}.html`;
+  return `
     <article id="banner">
         <div class="content">
             <header>
@@ -123,10 +126,10 @@ function featuredPost({ slug, id, title, excerpt, feature_image }){
             <img src="${feature_image}" alt="Editorial Theme for Ghost" />
         </a>
     </article>
-    `
-}
+    `;
+};
 
-module.exports = { 
-    authorTemplate,
-    sectionTemplate,
-}
+module.exports = {
+  authorTemplate,
+  sectionTemplate,
+};

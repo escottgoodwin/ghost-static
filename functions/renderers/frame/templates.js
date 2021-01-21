@@ -1,43 +1,42 @@
-const title = 'Static Times'
-const gh_cdn_url = 'https://cdn.jsdelivr.net/gh/escottgoodwin/ghost-static/assets/'
-const url = "https://www.evansgoodwin.com"
-const description = "News about the static world."
-const favicon = `${gh_cdn_url}favicon.png`
-const twitter = 'https://twitter.com/tryghost'
-const facebook = 'https://www.facebook.com/ghost'
+const title = "Static Times";
+const gh_cdn_url = "https://cdn.jsdelivr.net/gh/escottgoodwin/ghost-static/assets/";
+const url = "https://www.evansgoodwin.com";
+const description = "News about the static world.";
+const favicon = `${gh_cdn_url}favicon.png`;
+const twitter = "https://twitter.com/tryghost";
+const facebook = "https://www.facebook.com/ghost";
 
-//site sections - listed on sidebar and has their own page with associated posts
+// site sections - listed on sidebar and has their own page with associated posts
 const tags = [
-    {
-        name:'Front Page',
-        slug: 'front-page'
-    },
-    {
-        name:'Business',
-        slug: 'business'
-    },
-    {
-        name:'Sports',
-        slug: 'sports'
-    },
-    {
-        name:'Search',
-        slug: 'search'
-    }
-]
+  {
+    name: "Front Page",
+    slug: "front-page",
+  },
+  {
+    name: "Business",
+    slug: "business",
+  },
+  {
+    name: "Sports",
+    slug: "sports",
+  },
+  {
+    name: "Search",
+    slug: "search",
+  },
+];
 
-//links on sidebar
-const pageLink = ({ slug, name }) => `<li class="nav-home active"><a href="${slug}.html">${name}</a></li>`
+// links on sidebar
+const pageLink = ({slug, name}) => `<li class="nav-home active"><a href="${slug}.html">${name}</a></li>`;
 
-const pagesMenu = pages => pages.map(p => pageLink(p)).join('')
+// links on sidebar
+const pagesMenu = (pages) => pages.map((p) => pageLink(p)).join("");
 
-// sidebar, title and footer that frames the main content - post or section pages
-// includes links to css and javascript that are hosted on project github assets folder and served through jsdeliver
-function frame(content,path){
+// sidebar, title and footer that frames the main content - post or section pages includes links to css and javascript that are hosted on project github assets folder and served through jsdeliver
+const frame = (content, path) => {
+  const menu = pagesMenu(tags);
 
-    const menu = pagesMenu(tags)
-
-    return `
+  return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -148,17 +147,14 @@ function frame(content,path){
                 <script src="${gh_cdn_url}main.js"></script>
                </body>
             </html>
-    `
-    }
+    `;
+};
 
-//renders search page that provides real time fulltext search through typsense
-//uses algolia's instantsearch library for the ui  
-//https://github.com/algolia/instantsearch.js/
-function renderSearchPage(){
+// renders search page that provides real time fulltext search through typsense uses algolia's instantsearch library for the ui https://github.com/algolia/instantsearch.js/
+const renderSearchPage = () => {
+  const menu = pagesMenu(tags);
 
-    const menu = pagesMenu(tags)
-
-    const content = `
+  const content = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -281,11 +277,11 @@ function renderSearchPage(){
             <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.9.0"></script>
            </body>
         </html>
-    `
-    return content
-}
+    `;
+  return content;
+};
 
-module.exports = { 
-    frame,
-    renderSearchPage
-}
+module.exports = {
+  frame,
+  renderSearchPage,
+};
