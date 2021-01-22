@@ -19,12 +19,22 @@ const bucket = storage.bucket(bucketName);
 // update realtime database
 const updateFirebase = (name, email, fileName) => {
   console.log(`updating preview ${fileName} by ${email}`);
-  current_user = email.replace('@','_at_').replace('.','_')
+  const current_user = email.replace("@", "_at_").replace(".", "_");
   const now = Date.now();
 
   fb.db.ref(current_user).set({
     url: fileName,
     edited_by: name,
+    timestamp: now.toString(),
+  });
+};
+
+// update realtime database
+const updateFBDoc = (fileName) => {
+  const now = Date.now();
+  console.log(`${fileName} added to db`);
+  fb.db.ref(`posts/${fileName}`).set({
+    url: fileName,
     timestamp: now.toString(),
   });
 };
@@ -68,11 +78,12 @@ const uploadDraft = async (path, doc, name, email) => {
         metadata: {
           contentType: "text/html; charset=utf-8",
         },
-      }).then(res => {
-        updateFirebase(name, email, path)
-      }).catch(e => {
-        console.log(e)
-      })
+      }).then((res) => {
+        updateFirebase(name, email, path);
+        updateFBDoc(path);
+      }).catch((e) => {
+        console.log(e);
+      });
 };
 
 // purges cloudflare cache with authenticated request for single url to allow updated page to load

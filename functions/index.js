@@ -4,6 +4,7 @@ const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
 const uploader = require("./renderers/uploader");
 const ts = require("./typesense");
+const {mysqlQuery} = require("./mysql");
 
 // creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {
@@ -64,15 +65,10 @@ exports.createGhostPost = functions.https.onRequest(async (req, res) => {
     },
   } = req;
 
-  const path = `${current.slug}-${current.id}.html`;
-
   await postRender.renderUploadGhostPost(current);
 
   await sectionRender.renderGhostAuthorPage(current.primary_author);
 
-  current.authors.forEach(async (author) => {
-    updateFirebase(author.email, path);
-  });
   // update section pages
   current.tags.forEach(async (tag) => {
     sectionRender.renderGhostSectionPage(tag);
@@ -98,11 +94,6 @@ exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
   if (current) {
   // render post page
     await postRender.renderUploadGhostPost(current);
-
-    const path = `${current.slug}-${current.id}.html`;
-    current.authors.forEach(async (author) => {
-      updateFirebase(author.email, path);
-    });
 
     await sectionRender.renderGhostAuthorPage(current.primary_author);
 
@@ -152,4 +143,16 @@ exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
 exports.renderSearchPage = functions.https.onRequest(async (req, res) => {
   sectionRender.renderSearchPage();
   res.status(200).send("search page");
+});
+
+exports.getAuthorDrafts = functions.https.onRequest(async (req, res) => {
+  const {
+    body: {
+      author_email,
+    },
+  } = req;
+  const sqlQuery = "select p.title, p.slug from posts p inner join posts_authors pa on p.id = pa.post_id inner join users u on u.id = pa.author_id where p.status = 'draft' AND u.email = ?";
+  const queryVariables = [author_email];
+  const results = await mysqlQuery(sqlQuery, queryVariables);
+  res.status(200).send(results);
 });

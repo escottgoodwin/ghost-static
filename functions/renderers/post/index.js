@@ -33,7 +33,7 @@ const renderGhostPost = (post) => {
 // new rendered post is written to temporary storage and then upload to google storage
 const renderUploadGhostPost = async (post)=> {
   const {slug, id} = post;
-  
+
   const path = `${slug}-${id}.html`;
   const filepath = `/tmp/${path}`;
 
@@ -52,13 +52,13 @@ const renderUploadGhostPost = async (post)=> {
 // new rendered draft is written to temporary storage uploaded to google storage and updates preview
 const renderUploadGhostDraft = async (post)=> {
   const {slug, id, primary_author} = post;
-  const {name, email} = primary_author 
+  const {name, email} = primary_author;
   const path = `${slug}-${id}.html`;
 
   // generate html from template
   const newDoc = renderGhostPost(post);
   // write render upload to storage
-  uploader.uploadDraft(path, newDoc,name, email);
+  uploader.uploadDraft(path, newDoc, name, email);
 };
 
 module.exports = {

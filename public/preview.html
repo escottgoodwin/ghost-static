@@ -76,19 +76,19 @@
       document.addEventListener('DOMContentLoaded', () => {
         var db = firebase.database();
         if (location.hostname === "localhost") {
-        db.useEmulator("localhost", 9000);
-      } 
-       
+          db.useEmulator("localhost", 9000);
+        } 
+              
         const current = document.querySelector('#current_webpage');
         const name = document.getElementById("name")
         var storage = firebase.storage();
-        
+
         function signOut() {
           firebase.auth().signOut();
         }
 
         document.getElementById('quickstart-sign-in').addEventListener('click', signOut, false);
-        current.innerHTML='Loading...'
+        current.innerHTML = `<div class = "mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>`;
         let current_user;
          firebase.auth().onAuthStateChanged(user => { 
           if (user) {
@@ -103,25 +103,22 @@
 
         ref.on("value", snapshot => {
           var data = snapshot.val();
-         
+          
           var page_url = data[current_user].url
           name.innerHTML = data[current_user].edited_by
           var timestamp = Date(data[current_user].timestamp);
           
           edit_date.innerHTML = timestamp.toString()
+          current.innerHTML = `<div class = "mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>`;
 
           if(data !== null){
 
             var pathReference = storage.ref(`drafts/${page_url}`);
             pathReference.getDownloadURL().then(async url => {
               const response = await fetch(url);
-              //const html = await response.text();
               const iframe = `<iframe src="${url}" title="Ghost Preview" height="700" ></iframe>`
-              //current.innerHTML = html;
               current.innerHTML = iframe;
             });
-
-            // Let's get a download URL for the file.
           
             }
           }, error => {
