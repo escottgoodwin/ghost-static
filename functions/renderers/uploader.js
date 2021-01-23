@@ -33,7 +33,7 @@ const updateFirebase = (name, email, fileName) => {
 const updateFBDoc = (fileName) => {
   const now = Date.now();
   console.log(`${fileName} added to db`);
-  fb.db.ref(`posts/${fileName}`).set({
+  fb.db.ref(`${fileName}`).set({
     url: fileName,
     timestamp: now.toString(),
   });
@@ -79,8 +79,9 @@ const uploadDraft = async (path, doc, name, email) => {
           contentType: "text/html; charset=utf-8",
         },
       }).then((res) => {
+        const fbpath = path.replace('.html','')
         updateFirebase(name, email, path);
-        updateFBDoc(path);
+        updateFBDoc(fbpath);
       }).catch((e) => {
         console.log(e);
       });

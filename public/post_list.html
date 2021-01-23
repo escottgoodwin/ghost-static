@@ -13,15 +13,12 @@
     <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
     <!-- include only the Firebase features as you need -->
     <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
-    <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
     <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
-    <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
     <!-- 
       initialize the SDK after all desired features are loaded, set useEmulator to false
       to avoid connecting the SDK to running emulators.
     -->
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
 
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
@@ -32,6 +29,7 @@
       #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
       #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
       #title { color:#ECEFF1; }
+      a { color: #656d91;  font-size: 18px; }
       .mdl-layout {
         align-items: center;
         justify-content: center;
@@ -57,82 +55,72 @@
       <table style="width:100%; padding:10px;" >
         <tr >
           <td style="text-align:left">
-            <h4>Ghost Preview</h4>
+            <h4>
+              Ghost Preview
+            </h4>
           </td>
-          <td style="text-align:center">
+          <td >
+            <div id="name">
+              Loading
+            </div>
           </td>
           <td style="text-align:right">
-            <button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in" name="signin">Sign Out</button>
+            <button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in" name="signin">
+              Sign Out
+            </button>
           </td>
         
         </tr>
       </table>
      
     </div>
-    <div id="current_webpage" data-content="partial.html"> 
+
+    <main class="mdl-layout__content">
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+  
+        <!-- Container for the demo -->
+        <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+          <div class="mdl-card__title  mdl-color-text--white" style="background-color: rgb(101, 109, 145);">
+            <h2 class="mdl-card__title-text">
+              Your Drafts
+            </h2>
+          </div>
+          <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <div id="post_list" ></div>
+          </div>
+        </div>
+  
+      </div>
+    </main>
+   
     <script>
-      const current = document.querySelector('#current_webpage');
-      const postsDropdown = document.querySelector('#posts_dropdown');
-      current.innerHTML = `<div style="margin:25% 50%;" class = "mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>`;
-       
+      const postList = document.querySelector('#post_list');
+      const name = document.querySelector('#name');
+
       document.addEventListener('DOMContentLoaded', () => {
         var functions = firebase.functions();
-        var storage = firebase.storage();
-        var db = firebase.database();
-
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const slug = urlParams.get('slug')
-        console.log(slug);
-
-        if (location.hostname === "localhost") {
-          db.useEmulator("localhost", 9000);
-        } 
       
-
         document.getElementById('quickstart-sign-in').addEventListener('click', signOut, false);
- 
+
         function signOut() {
           firebase.auth().signOut();
         }
-
-        var ref = db.ref(slug);
-
-        firebase.auth().onAuthStateChanged(user => { 
+        
+         firebase.auth().onAuthStateChanged(user => { 
           if (user) {
-           
-            
-            ref.on("value", snapshot => {
-              
-              const data = snapshot.val();
+            console.log(user)
+            name.innerHTML = user.email
 
-              
-              if(data !== null){
-                  const { url, last_updated } = data
-                  console.log(data)
-                  //var timestamp = Date(data[current_user].timestamp);
-              
-                  var pathReference = storage.ref(`drafts/${slug}.html`);
-          
-                  pathReference.getDownloadURL().then(url => {
-                    const iframe = `<iframe src="${url}" title="Ghost Preview" height="700" ></iframe>`
-                    current.innerHTML = iframe;
-                  });
-              
-                } else {
-                  console.log('no post')
-                   var pathReference = storage.ref(`drafts/loading.html`);
-
-                  pathReference.getDownloadURL().then(url => {
-                      const iframe = `<iframe src="${url}" title="Ghost Preview" height="700" ></iframe>`
-                      current.innerHTML = iframe;
-                    });
-                }
-              })
-            } else {
-              console.log('no author')
-            }
-          });    
+            var addMessage = firebase.functions().httpsCallable('getAuthorDraftsCall');
+            addMessage()
+              .then((result) => {
+                const choices = result.data.map(p => `<p><a href="preview1.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`).join('')
+                postList.innerHTML = choices
+              }); 
+          } else {
+            window.location.href = "/";
+          }
+         });
 
         try {
           let app = firebase.app();
