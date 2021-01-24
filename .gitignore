@@ -66,4 +66,4 @@ node_modules/
 .env
 
 # emulator environment vars 
-.runtimeconfig
+.runtimeconfig.json
