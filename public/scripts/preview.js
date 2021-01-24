@@ -3,17 +3,12 @@ var current = document.querySelector('#current_webpage');
       current.innerHTML = `<div style="margin:25% 50%;" class = "mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>`;
        
       document.addEventListener('DOMContentLoaded', () => {
-        var functions = firebase.functions();
         var storage = firebase.storage();
         var db = firebase.database();
 
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         const slug = urlParams.get('slug')
-
-        if (location.hostname === "localhost") {
-          db.useEmulator("localhost", 9000);
-        } 
 
         function loadPage(path){
           var pathReference = storage.ref(path);

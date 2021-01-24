@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user) {
       name.innerHTML = user.email
 
-      var addMessage = firebase.functions().httpsCallable('getAuthorDraftsCall');
+      var addMessage = functions.httpsCallable('getAuthorDraftsCall');
       
       addMessage()
         .then((result) => {
@@ -36,6 +36,5 @@ document.addEventListener('DOMContentLoaded', () => {
     let app = firebase.app();
   } catch (e) {
     console.error(e);
-   
   }
 });

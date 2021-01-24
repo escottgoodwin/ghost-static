@@ -17,7 +17,7 @@ const renderGhostPost = (post) => {
   } = post;
 
   const path = `${slug}-${id}.html`;
-  const pubDate = moment(published_at).format("MMMM Do YYYY, h:mm a");
+  const pubDate = published_at ? moment(published_at).format("MMMM Do YYYY, h:mm a") : moment().format("MMMM Do YYYY, h:mm a");
 
   return templates.postTemplate({
     html,

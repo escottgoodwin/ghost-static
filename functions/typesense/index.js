@@ -3,11 +3,10 @@ const moment = require("moment");
 const Typesense = require("typesense");
 
 const local = process.env.FUNCTIONS_EMULATOR;
-
 const typesenseHost = functions.config().typesense.host;
 const typesenseApiKey= functions.config().typesense.apikey;
 
-// asdf
+// typesense collection
 const collectionName = local ? "ghost_posts_local" : functions.config().typesense.collectionname;
 
 // indexes new post

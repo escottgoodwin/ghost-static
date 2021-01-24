@@ -1,8 +1,9 @@
+// deploy - wrangler publish
 addEventListener("fetch", event => {
   event.respondWith(handleRequest(event))
 })
 
-const BUCKET_NAME = "static_times"
+const BUCKET_NAME = "static-times"
 const BUCKET_URL = `http://storage.googleapis.com/${BUCKET_NAME}`
 
 async function serveAsset(event) {
@@ -14,12 +15,12 @@ async function serveAsset(event) {
 
   //if not in cache, get page from google storage, serve it, and put it in the cache
   if (!response) {
-    //if route is domain root, serve the front page, otherwise serve file from google storage that matches route
+    // if route is domain root, serve the front page, otherwise serve file from google storage that matches route
     // route - http://www.example.com/listings.html 
     // google storage - http://storage.googleapis.com/example-bucket/listings.html
-    fullurl = url.pathname==='/' ? `${BUCKET_URL}/front-page.html` : `${BUCKET_URL}${url.pathname}`
+    fullUrl = url.pathname==='/' ? `${BUCKET_URL}/front-page.html` : `${BUCKET_URL}${url.pathname}`
     //reassign response from the cache response to the response from google storage
-    response = await fetch(fullurl)
+    response = await fetch(fullUrl)
 
     //serve and cache response for a year
     const headers = { "cache-control": "public, max-age=30, s-maxage=31536000" }

@@ -7,7 +7,7 @@ const host = functions.config().db.host;
 const user= functions.config().db.user;
 const password = functions.config().db.password;
 const port = functions.config().db.port;
-const name = local ? 'ghost' : functions.config().db.name;
+const name = local ? "ghost" : functions.config().db.name;
 
 // run mysql query with variables
 const connection = mysql.createConnection({

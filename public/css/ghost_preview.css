@@ -10,6 +10,7 @@ a { color: #656d91;  font-size: 18px; }
   align-items: center;
   justify-content: center;
 }
+#preview-header { background: #656d91; max-width: '100vw';  padding: 10px; color:white;  align-items: center; }
 #quickstart-sign-in { background: #314497; color:#ECEFF1; }
 #message b { color: #ECEFF1; }
 #iframe {

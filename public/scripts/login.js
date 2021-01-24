@@ -92,7 +92,7 @@ function sendPasswordReset() {
 function initApp() {
     // Listening for auth state changes.
     document.getElementById('quickstart-sign-in').textContent = 'Sign in';
-    firebase.auth().useEmulator('http://localhost:9099/');
+
     firebase.auth().onAuthStateChanged(user => {
     
     if (user) {

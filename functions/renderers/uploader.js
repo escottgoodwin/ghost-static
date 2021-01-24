@@ -18,7 +18,7 @@ const bucket = storage.bucket(bucketName);
 
 // update realtime database
 const updateFBDoc = (fileName) => {
-  const fbpath = fileName.replace('.html','')
+  const fbpath = fileName.replace(".html", "");
   const now = Date.now();
   console.log(`${fbpath} added to db`);
   fb.db.ref(fbpath).set({
@@ -50,7 +50,6 @@ const uploadFile = async (path) => {
         cacheControl: "max-age=30, s-maxage=31536000", // indef CDN cache since we purge manually
       },
     });
-
     console.log(`${path} uploaded`);
     updateFBDoc(path);
     return await purgeUrl(path);
@@ -60,7 +59,7 @@ const uploadFile = async (path) => {
 };
 
 // update to drafts folder in fb storage and update real time db
-const uploadDraft = async (path, doc, name, email) => {
+const uploadDraft = async (path, doc) => {
   fb.fbstorage.bucket()
       .file(`${path}`)
       .save(doc, {
