@@ -67,3 +67,5 @@ node_modules/
 
 # emulator environment vars 
 .runtimeconfig.json
+
+fb_export/
