@@ -17,23 +17,11 @@ const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/pu
 const bucket = storage.bucket(bucketName);
 
 // update realtime database
-const updateFirebase = (name, email, fileName) => {
-  console.log(`updating preview ${fileName} by ${email}`);
-  const current_user = email.replace("@", "_at_").replace(".", "_");
-  const now = Date.now();
-
-  fb.db.ref(current_user).set({
-    url: fileName,
-    edited_by: name,
-    timestamp: now.toString(),
-  });
-};
-
-// update realtime database
 const updateFBDoc = (fileName) => {
+  const fbpath = fileName.replace('.html','')
   const now = Date.now();
-  console.log(`${fileName} added to db`);
-  fb.db.ref(`${fileName}`).set({
+  console.log(`${fbpath} added to db`);
+  fb.db.ref(fbpath).set({
     url: fileName,
     timestamp: now.toString(),
   });
@@ -64,24 +52,24 @@ const uploadFile = async (path) => {
     });
 
     console.log(`${path} uploaded`);
+    updateFBDoc(path);
     return await purgeUrl(path);
   } catch (error) {
     console.log(error);
   }
 };
 
+// update to drafts folder in fb storage and update real time db
 const uploadDraft = async (path, doc, name, email) => {
   fb.fbstorage.bucket()
-      .file(`drafts/${path}`)
+      .file(`${path}`)
       .save(doc, {
         gzip: true,
         metadata: {
           contentType: "text/html; charset=utf-8",
         },
       }).then((res) => {
-        const fbpath = path.replace('.html','')
-        updateFirebase(name, email, path);
-        updateFBDoc(fbpath);
+        updateFBDoc(path);
       }).catch((e) => {
         console.log(e);
       });

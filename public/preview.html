@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>Draft Preview - Ghost</title>
 
       <!-- Material Design Theming -->
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
@@ -16,131 +16,13 @@
     <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
     <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
     <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
+
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: #656d91; max-width: '100vw';  padding: 0px; border-radius: 1px; color:white;  align-items: center; }
-      #message h2 { color:  #ECEFF1; font-weight: 300; font-size: 16px; }
-      #message h1 { font-size: 22px; font-weight: 300; color:  #ECEFF1; }
-      #message p {  margin: 0; font-size: 12px;  color:white}
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #title { color:#ECEFF1; }
-      .mdl-layout {
-        align-items: center;
-        justify-content: center;
-      }
-      #quickstart-sign-in { background: #8fadc2; color: #4c5a96; }
-      #message b { color: #ECEFF1; }
-      #iframe {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
+    <link rel="stylesheet" href="css/ghost_preview.css">
   </head>
   <body>
-    <div id="message">
-      <table style="width:100%; padding:10px;" >
-        <tr >
-          <td style="text-align:left">
-            <h4>Ghost Preview</h4>
-          </td>
-          <td style="text-align:center">
-          </td>
-          <td style="text-align:right">
-            <button class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in" name="signin">Sign Out</button>
-          </td>
-        
-        </tr>
-      </table>
-     
-    </div>
+    <div id="preview-header">Ghost Draft Preview - Last Edit <span id="edit_time"></span></div>
     <div id="current_webpage" data-content="partial.html"> 
-    <script>
-      const current = document.querySelector('#current_webpage');
-      const postsDropdown = document.querySelector('#posts_dropdown');
-      current.innerHTML = `<div style="margin:25% 50%;" class = "mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>`;
-       
-      document.addEventListener('DOMContentLoaded', () => {
-        var functions = firebase.functions();
-        var storage = firebase.storage();
-        var db = firebase.database();
-
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const slug = urlParams.get('slug')
-        console.log(slug);
-
-        if (location.hostname === "localhost") {
-          db.useEmulator("localhost", 9000);
-        } 
-      
-
-        document.getElementById('quickstart-sign-in').addEventListener('click', signOut, false);
- 
-        function signOut() {
-          firebase.auth().signOut();
-        }
-
-        var ref = db.ref(slug);
-
-        firebase.auth().onAuthStateChanged(user => { 
-          if (user) {
-           
-            
-            ref.on("value", snapshot => {
-              
-              const data = snapshot.val();
-
-              
-              if(data !== null){
-                  const { url, last_updated } = data
-                  console.log(data)
-                  //var timestamp = Date(data[current_user].timestamp);
-              
-                  var pathReference = storage.ref(`drafts/${slug}.html`);
-          
-                  pathReference.getDownloadURL().then(url => {
-                    const iframe = `<iframe src="${url}" title="Ghost Preview" height="700" ></iframe>`
-                    current.innerHTML = iframe;
-                  });
-              
-                } else {
-                  console.log('no post')
-                   var pathReference = storage.ref(`drafts/loading.html`);
-
-                  pathReference.getDownloadURL().then(url => {
-                      const iframe = `<iframe src="${url}" title="Ghost Preview" height="700" ></iframe>`
-                      current.innerHTML = iframe;
-                    });
-                }
-              })
-            } else {
-              console.log('no author')
-            }
-          });    
-
-        try {
-          let app = firebase.app();
-        } catch (e) {
-          console.error(e);
-         
-        }
-      });
-    </script>
+    <script src="scripts/preview.js"></script>
   </body>
 </html>

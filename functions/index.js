@@ -148,9 +148,15 @@ exports.renderSearchPage = functions.https.onRequest(async (req, res) => {
 exports.getAuthorDraftsCall = functions.https.onCall(async (data,context) => {
   const email = context.auth.token.email 
   console.log(email)
-  const sqlQuery = "select p.id, p.title, p.slug from posts p inner join posts_authors pa on p.id = pa.post_id inner join users u on u.id = pa.author_id where p.status = 'draft' AND u.email = ?";
+  const sqlQuery = "select p.id, p.title, p.slug, p.status from posts p inner join posts_authors pa on p.id = pa.post_id inner join users u on u.id = pa.author_id where p.status = 'draft' OR p.status = 'published' AND u.email = ?";
   const queryVariables = [email];
+
   const results = await mysqlQuery(sqlQuery, queryVariables);
-  console.log(results);
-  return results;
+  const drafts = results.filter(d => d.status === 'draft')
+  const published = results.filter(d => d.status === 'published')
+
+  return {
+    drafts,
+    published
+  };
 });
