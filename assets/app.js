@@ -36,14 +36,11 @@ search.addWidgets([
       item: `
       <div>
       <div class="hit-name">
-        <a href="{{path}.html">
           {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
-        </a>
       </div>
       <div >
-        {{ "attribute": "authors" }}
+        {{ "attribute": "primary_author" }}
       </div>
-      <div class="hit-price">{{published_at}}</div>
     </div>
       `,
     },
