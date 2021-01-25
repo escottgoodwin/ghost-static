@@ -4,7 +4,7 @@ import TypesenseInstantSearchAdapter from 'https://cdn.skypack.dev/typesense-ins
 
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
-    apiKey: 'JcWx2J2nq3vZYMHRY5LYAcHN4lpRTfNJ', // Be sure to use an API key that only allows searches, in production
+    apiKey: 'Oh54vu2H3L3eSyJnMTAQCgKxYM1R4Umd', // Be sure to use an API key that only allows searches, in production
     nodes: [
       {
         host: 'u7c0pfjloi4wv8zdp-1.a1.typesense.net',
