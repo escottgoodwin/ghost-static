@@ -1,10 +1,8 @@
-/* global algoliasearch instantsearch */
-
 import TypesenseInstantSearchAdapter from 'https://cdn.skypack.dev/typesense-instantsearch-adapter';
 
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
-    apiKey: 'Oh54vu2H3L3eSyJnMTAQCgKxYM1R4Umd', // Be sure to use an API key that only allows searches, in production
+    apiKey: 'GXGoFzSCPuJLOCejXodxBJxFb5FD1ah8', // Be sure to use an API key that only allows searches, in production
     nodes: [
       {
         host: 'u7c0pfjloi4wv8zdp-1.a1.typesense.net',
