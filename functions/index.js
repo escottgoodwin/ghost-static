@@ -12,12 +12,6 @@ exports.createSchema = functions.https.onRequest(async (req, res) => {
   res.status(200).send(JSON.stringify(data));
 });
 
-// creates predefined typesense schema
-exports.createSchema = functions.https.onRequest(async (req, res) => {
-  const data = await ts.createSchema();
-  res.status(200).send(JSON.stringify(data));
-});
-
 // deletes typesense schema
 exports.deleteSchema = functions.https.onRequest(async (req, res) => {
   const result = await ts.deleteSchema();
@@ -147,7 +141,7 @@ exports.renderSearchPage = functions.https.onRequest(async (req, res) => {
 
 exports.getAuthorDraftsCall = functions.https.onCall(async (data, context) => {
   const email = context.auth.token.email;
-  console.log(email);
+
   const sqlQuery = "select p.id, p.title, p.slug, p.status from posts p inner join posts_authors pa on p.id = pa.post_id inner join users u on u.id = pa.author_id where p.status = 'draft' OR p.status = 'published' AND u.email = ?";
   const queryVariables = [email];
 

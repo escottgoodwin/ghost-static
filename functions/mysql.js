@@ -34,6 +34,18 @@ const mysqlQuery = (sqlQuery, queryVariables) => {
   });
 };
 
+const knex = require('knex')({
+  client: 'mysql',
+  connection: {
+    host: host,
+    user: user,
+    password: password,
+    database: name,
+    port: port,
+  }
+});
+
 module.exports = {
   mysqlQuery,
+  knex
 };

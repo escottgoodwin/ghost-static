@@ -1,8 +1,11 @@
+# Make sure Cloud Run and Storage Apis are enabled. 
+# https://support.google.com/googleapi/answer/6158841?hl=en
 # docker build -t CONTAINER_NAME .
 # docker tag CONTAINER_NAME gcr.io/GCS_PROJECT_NAME/CONTAINER_NAME
 # docker push gcr.io/GCS_PROJECT_NAME/CONTAINER_NAME
 # In Cloud Run, create new service and choose CONTAINER_NAME image
 # example
+# https://cloud.google.com/run/docs/quickstarts/build-and-deploy
 # docker build -t ghost-static .
 # docker tag ghost-static gcr.io/ghost-firebase/ghost-static
 # docker push gcr.io/ghost-firebase/ghost-static
