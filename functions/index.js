@@ -4,7 +4,7 @@ const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
 const uploader = require("./renderers/uploader");
 const ts = require("./typesense");
-const {mysqlQuery, knex } = require("./mysql");
+const {knex} = require("./mysql");
 
 // creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {
@@ -139,33 +139,17 @@ exports.renderSearchPage = functions.https.onRequest(async (req, res) => {
   res.status(200).send("search page");
 });
 
-exports.knexQuery = functions.https.onRequest(async (req, res) => {
-  const { email } = req.body;
-  const results = await knex.select('p.id', 'p.title', 'p.slug','p.status')
-  .from('posts as p')
-  .innerJoin('posts_authors as pa','p.id','=','pa.post_id')
-  .innerJoin('users as u','u.id','=','pa.author_id')
-  .where('u.email', email)
-  .orWhere('p.status','published')
-  .orWhere('p.status','draft')
-  res.status(200).send(results);
-});
-
-
+// gets drafts and published posts by logged in author
 exports.getAuthorDraftsCall = functions.https.onCall(async (data, context) => {
   const email = context.auth.token.email;
 
-  // const sqlQuery = "select p.id, p.title, p.slug, p.status from posts p inner join posts_authors pa on p.id = pa.post_id inner join users u on u.id = pa.author_id where p.status = 'draft' OR p.status = 'published' AND u.email = ?";
-  // const queryVariables = [email];
-  //const results = await mysqlQuery(sqlQuery, queryVariables);
-
-  const results = await knex.select('p.id', 'p.title', 'p.slug','p.status')
-  .from('posts as p')
-  .innerJoin('posts_authors as pa','p.id','=','pa.post_id')
-  .innerJoin('users as u','u.id','=','pa.author_id')
-  .where('u.email', email)
-  .orWhere('p.status','published')
-  .orWhere('p.status','draft')
+  const results = await knex.select("p.id", "p.title", "p.slug", "p.status")
+      .from("posts as p")
+      .innerJoin("posts_authors as pa", "p.id", "=", "pa.post_id")
+      .innerJoin("users as u", "u.id", "=", "pa.author_id")
+      .where("u.email", email)
+      .orWhere("p.status", "published")
+      .orWhere("p.status", "draft");
 
   const drafts = results.filter((d) => d.status === "draft");
   const published = results.filter((d) => d.status === "published");

@@ -1,8 +1,10 @@
+/* global algoliasearch instantsearch */
+
 import TypesenseInstantSearchAdapter from 'https://cdn.skypack.dev/typesense-instantsearch-adapter';
 
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
-    apiKey: 'GXGoFzSCPuJLOCejXodxBJxFb5FD1ah8', // Be sure to use an API key that only allows searches, in production
+    apiKey: 'JcWx2J2nq3vZYMHRY5LYAcHN4lpRTfNJ', // Be sure to use an API key that only allows searches, in production
     nodes: [
       {
         host: 'u7c0pfjloi4wv8zdp-1.a1.typesense.net',
@@ -35,12 +37,14 @@ search.addWidgets([
     templates: {
       item: `
       <div>
+      <img src="{{feature_image}}" align="left" alt="{{name}}" width=100 style="margin-right: 10px;"/>
       <div class="hit-name">
-          {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
+        {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
       </div>
       <div >
-        {{ "attribute": "primary_author" }}
+        {{ "attribute": "authors" }}
       </div>
+      <div class="hit-price">{{published_at}}</div>
     </div>
       `,
     },
