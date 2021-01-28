@@ -4,7 +4,7 @@ import TypesenseInstantSearchAdapter from 'https://cdn.skypack.dev/typesense-ins
 
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
-    apiKey: 'Oh54vu2H3L3eSyJnMTAQCgKxYM1R4Umd', // Be sure to use an API key that only allows searches, in production
+    apiKey: 'Wnw62cByEyTMXMNgKCuNXJEmZzKAIcn0', // Be sure to use an API key that only allows searches, in production
     nodes: [
       {
         host: 'u7c0pfjloi4wv8zdp-1.a1.typesense.net',
@@ -32,26 +32,10 @@ search.addWidgets([
   instantsearch.widgets.searchBox({
     container: '#searchbox',
   }),
+
   instantsearch.widgets.hits({
     container: '#hits',
-    templates: {
-      item: `
-      <div>
-      <img src="{{feature_image}}" align="left" alt="{{name}}" width=100 style="margin-right: 10px;"/>
-      <div class="hit-name">
-        {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
-      </div>
-      <div >
-        {{ "attribute": "primary_author" }}
-      </div>
-      <div class="hit-price">{{published_at}}</div>
-    </div>
-      `,
-    },
-  }),
-  instantsearch.widgets.pagination({
-    container: '#pagination',
-  }),
+  })
 ]);
 
 search.start();
