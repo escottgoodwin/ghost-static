@@ -17,6 +17,9 @@ services:
       database__connection__user: ymroddi
       database__connection__password: Royallord84@
       database__connection__database: ghost1
+      database__connection__port: 17599
+      storage__active: gcs
+      storage__gcs__bucket: ghost-static-media
       # this url value is just an example, and is likely wrong for your environment!
       url: http://localhost:8080
 

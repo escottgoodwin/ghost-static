@@ -9,7 +9,7 @@ const local = process.env.FUNCTIONS_EMULATOR;
 const cfAuthKey = functions.config().cloudflare.authkey;
 const cfZoneId = functions.config().cloudflare.zoneid;
 const cfEmail = functions.config().cloudflare.email;
-const bucketName = local ? "static_times" : functions.config().bucket.name;
+const bucketName = local ? "static-times-local" : functions.config().bucket.name;
 const siteUrl = functions.config().cdn.url;
 
 const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`;
@@ -47,7 +47,7 @@ const uploadFile = async (path) => {
       gzip: true,
       metadata: {
         contentType: "text/html; charset=utf-8",
-        cacheControl: "max-age=30, s-maxage=31536000", // indef CDN cache since we purge manually
+        cacheControl: "max-age=0, s-maxage=0", // indef CDN cache since we purge manually
       },
     });
     console.log(`${path} uploaded`);

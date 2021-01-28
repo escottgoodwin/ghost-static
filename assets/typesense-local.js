@@ -25,7 +25,7 @@ const searchClient = typesenseInstantsearchAdapter.searchClient;
 
 const search = instantsearch({
   searchClient,
-  indexName: 'ghost_posts',
+  indexName: 'ghost_posts_local',
 });
 
 search.addWidgets([

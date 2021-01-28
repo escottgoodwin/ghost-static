@@ -3,8 +3,15 @@ addEventListener("fetch", event => {
   event.respondWith(handleRequest(event))
 })
 
-const BUCKET_NAME = "static-times"
-const BUCKET_URL = `http://storage.googleapis.com/${BUCKET_NAME}`
+const BUCKET_URL = `http://storage.googleapis.com`
+
+function endsWithAny(suffixes, string) {
+  return suffixes.some(function (suffix) {
+      return string.endsWith(suffix);
+  });
+}
+
+const imgExtensions = ['.jpg','.gif','.webp']
 
 async function serveAsset(event) {
   const url = new URL(event.request.url)
@@ -18,7 +25,8 @@ async function serveAsset(event) {
     // if route is domain root, serve the front page, otherwise serve file from google storage that matches route
     // route - http://www.example.com/listings.html 
     // google storage - http://storage.googleapis.com/example-bucket/listings.html
-    fullUrl = url.pathname==='/' ? `${BUCKET_URL}/front-page.html` : `${BUCKET_URL}${url.pathname}`
+    const bucketName = endsWithAny(imgExtensions, url.pathname) ? 'media' : 'static-times-published'
+    fullUrl = url.pathname==='/' ? `${BUCKET_URL}/${bucketName}/front-page.html` : `${BUCKET_URL}/${bucketName}/${url.pathname}`
     //reassign response from the cache response to the response from google storage
     response = await fetch(fullUrl)
 

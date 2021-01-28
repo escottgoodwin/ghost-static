@@ -1,8 +1,10 @@
 /**
  * Handles the sign in button press.
  */
-function toggleSignIn() {
 
+
+function toggleSignIn() {
+    var auth = firebase.auth();
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     if (email.length < 4) {
@@ -15,7 +17,7 @@ function toggleSignIn() {
     }
     
     // Sign in with email and pass.
-    firebase.auth().signInWithEmailAndPassword(email, password)
+firebase.auth().signInWithEmailAndPassword(email, password)
     .catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -38,25 +40,26 @@ function handleSignUp() {
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     if (email.length < 4) {
-    alert('Please enter an email address.');
-    return;
+        alert('Please enter an email address.');
+        return;
     }
+
     if (password.length < 4) {
-    alert('Please enter a password.');
-    return;
+        alert('Please enter a password.');
+        return;
     }
     // Create user with email and pass.
-    firebase.auth().createUserWithEmailAndPassword(email, password)
+firebase.auth().createUserWithEmailAndPassword(email, password)
     .catch(function(error) {
     // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    if (errorCode == 'auth/weak-password') {
-        alert('The password is too weak.');
-    } else {
-        alert(errorMessage);
-    }
-    console.log(error);
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/weak-password') {
+            alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+  
     });
 }
 
@@ -74,17 +77,17 @@ function sendPasswordReset() {
     var email = document.getElementById('email').value;
     firebase.auth().sendPasswordResetEmail(email).then(function() {
     // Password Reset Email Sent!
-    alert('Password Reset Email Sent!');
+        alert('Password Reset Email Sent!');
     }).catch(function(error) {
     // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    if (errorCode == 'auth/invalid-email') {
-        alert(errorMessage);
-    } else if (errorCode == 'auth/user-not-found') {
-        alert(errorMessage);
-    }
-    console.log(error);
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/invalid-email') {
+            alert(errorMessage);
+        } else if (errorCode == 'auth/user-not-found') {
+            alert(errorMessage);
+        }
+    
     });
 }
 
@@ -95,17 +98,17 @@ function initApp() {
 
     firebase.auth().onAuthStateChanged(user => {
     
-    if (user) {
-        // User is signed in.
-        window.location.href = "/post_list.html";
-    
-    } else {
-        // User is signed out.
+        if (user) {
+            // User is signed in.
+            window.location.href = "/post_list.html";
         
-        console.log('signed out')
+        } else {
+            // User is signed out.
+            
+            console.log('signed out')
+            
+        }
         
-    }
-    
     });
 
     document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);

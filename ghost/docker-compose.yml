@@ -17,7 +17,8 @@ services:
       database__connection__port: 17599
       # this url value is just an example, and is likely wrong for your environment!
       url: http://localhost:8080
-
+    volumes:
+      - ./content/images:/var/lib/ghost/content/images
   db:
     image: mysql:5.7
     restart: always

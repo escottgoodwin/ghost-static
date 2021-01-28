@@ -1,5 +1,5 @@
 const title = "Static Times";
-const gh_cdn_url = "https://cdn.jsdelivr.net/gh/escottgoodwin/ghost-static/assets/";
+const gh_cdn_url = "https://cdn.jsdelivr.net/gh/escottgoodwin/ghost-static/assets";
 const url = "https://www.evansgoodwin.com";
 const description = "News about the static world.";
 const favicon = `${gh_cdn_url}favicon.png`;
@@ -49,7 +49,7 @@ const frame = (content, path) => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
             <link rel="shortcut icon" href="${favicon}">
-            <link rel="stylesheet" type="text/css" href="${gh_cdn_url}main.css" />
+            <link rel="stylesheet" type="text/css" href="${gh_cdn_url}/main.css" />
             <link rel="stylesheet" href="${gh_cdn_url}/font-awesome/css/font-awesome.min.css">
 
 
@@ -94,7 +94,7 @@ const frame = (content, path) => {
             </script>
 
             <meta name="generator" content="Ghost 3.40" />
-            <link rel="alternate" type="application/rss+xml" title="Editorial for Ghost" href="${url}/rss/" />
+            <link rel="alternate" type="application/rss+xml" title="${title}" href="${url}/rss/" />
 
             </head>
             <body class="is-preload home-template">
@@ -106,8 +106,8 @@ const frame = (content, path) => {
                             <header id="header">
                                 <a href="${url}" class="logo">${title}</a>
                                 <ul class="icons">
-                                    <li><a href="https://twitter.com/tryghost" class="icon fa-twitter" title="Twitter"><span class="label">Twitter</span></a></li>
-                                    <li><a href="https://www.facebook.com/ghost" class="icon fa-facebook" title="Facebook"><span class="label">Facebook</span></a></li>
+                                    <li><a href="${twitter}" class="icon fa-twitter" title="Twitter"><span class="label">Twitter</span></a></li>
+                                    <li><a href="${facebook}" class="icon fa-facebook" title="Facebook"><span class="label">Facebook</span></a></li>
                                 </ul>
                             </header>
 
@@ -137,14 +137,11 @@ const frame = (content, path) => {
 
                 </div>
 
-                <script src="https://cdn.jsdelivr.net/algoliasearch/3.32.0/algoliasearchLite.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.9.0"></script>
-                <script type="module" src="${gh_cdn_url}app.js"></script>
-                <script src="${gh_cdn_url}jquery.min.js"></script>
-                <script src="${gh_cdn_url}browser.min.js"></script>
-                <script src="${gh_cdn_url}breakpoints.min.js"></script>
-                <script src="${gh_cdn_url}util.js"></script>
-                <script src="${gh_cdn_url}main.js"></script>
+                <script src="${gh_cdn_url}/jquery.min.js"></script>
+                <script src="${gh_cdn_url}/browser.min.js"></script>
+                <script src="${gh_cdn_url}/breakpoints.min.js"></script>
+                <script src="${gh_cdn_url}/util.js"></script>
+                <script src="${gh_cdn_url}/main.js"></script>
                </body>
             </html>
     `;
@@ -167,11 +164,11 @@ const renderSearchPage = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <link rel="shortcut icon" href="${favicon}">
-        <link rel="stylesheet" type="text/css" href="${gh_cdn_url}main.css" />
+        <link rel="stylesheet" type="text/css" href="${gh_cdn_url}/main.css" />
         <link rel="stylesheet" href="${gh_cdn_url}/font-awesome/css/font-awesome.min.css">s
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@7/themes/algolia-min.css">
-        <link rel="stylesheet" href="${gh_cdn_url}index.css">
-        <link rel="stylesheet" href="${gh_cdn_url}app.css">
+        <link rel="stylesheet" href="${gh_cdn_url}/index.css">
+        <link rel="stylesheet" href="${gh_cdn_url}/app.css">
         <meta name="description" content="${description}" />
         <link rel="canonical" href="${url}/search.html" />
         <meta name="referrer" content="no-referrer-when-downgrade" />
@@ -267,12 +264,12 @@ const renderSearchPage = () => {
 
             </div>
 
-            <script type="module" src="${gh_cdn_url}app.js"></script>
-            <script src="${gh_cdn_url}jquery.min.js"></script>
-            <script src="${gh_cdn_url}browser.min.js"></script>
-            <script src="${gh_cdn_url}breakpoints.min.js"></script>
-            <script src="${gh_cdn_url}util.js"></script>
-            <script src="${gh_cdn_url}main.js"></script>
+            <script type="module" src="${gh_cdn_url}/app.js"></script>
+            <script src="${gh_cdn_url}/jquery.min.js"></script>
+            <script src="${gh_cdn_url}/browser.min.js"></script>
+            <script src="${gh_cdn_url}/breakpoints.min.js"></script>
+            <script src="${gh_cdn_url}/util.js"></script>
+            <script src="${gh_cdn_url}/main.js"></script>
             <script src="https://cdn.jsdelivr.net/algoliasearch/3.32.0/algoliasearchLite.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.9.0"></script>
            </body>
