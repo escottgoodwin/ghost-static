@@ -102,9 +102,9 @@ const deleteFromIndex = async (id) => {
 };
 
 // indexes new post
-const createSchema = async () => {
+const createSchema = async (collection) => {
   const postsSchema = {
-    "name": collectionName,
+    "name": collection,
     "fields": [
       {"name": "id", "type": "string"},
       {"name": "title", "type": "string"},
@@ -128,8 +128,8 @@ const createSchema = async () => {
 };
 
 // indexes new post
-const deleteSchema = async () => {
-  const result = await client.collections(collectionName).delete();
+const deleteSchema = async (collection) => {
+  const result = await client.collections(collection).delete();
   return result;
 };
 

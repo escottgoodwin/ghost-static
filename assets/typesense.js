@@ -25,16 +25,28 @@ const searchClient = typesenseInstantsearchAdapter.searchClient;
 
 const search = instantsearch({
   searchClient,
-  indexName: 'ghost_posts',
+  indexName: 'ghost_posts_local',
 });
 
 search.addWidgets([
   instantsearch.widgets.searchBox({
     container: '#searchbox',
   }),
+
   instantsearch.widgets.hits({
     container: '#hits',
-  }),
+    templates: {
+      item: 
+      `<div style="font-size:10px; color:#DCDCDC;">{{ published_at }}</div>
+        <a href="{{ path }}.html"
+          <h4>
+            {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
+          </h4>
+        </a>
+        <p>{{ primary_author }}</p>
+      `,
+    },
+  })
 ]);
 
 search.start();

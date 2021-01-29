@@ -8,13 +8,15 @@ const {knex} = require("./mysql");
 
 // creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {
-  const data = await ts.createSchema();
+  const { collectionName } = req.body
+  const data = await ts.createSchema(collectionName);
   res.status(200).send(JSON.stringify(data));
 });
 
 // deletes typesense schema
 exports.deleteSchema = functions.https.onRequest(async (req, res) => {
-  const result = await ts.deleteSchema();
+  const { collectionName } = req.body
+  const result = await ts.deleteSchema(collectionName);
   res.status(200).send(result);
 });
 
