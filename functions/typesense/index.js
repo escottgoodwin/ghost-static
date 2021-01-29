@@ -36,7 +36,9 @@ const indexPostTypesense = async (post) => {
   const path = `${slug}-${id}`;
   const authorNames = authors.map((a) => a.name);
   const tagNames = post.tags.map((t) => t.slug);
-  const pubTimestamp = moment(published_at).unix();
+  const mainTag = post.tags.filter(t => t.slug != 'front-page')[0].name
+  const pubTimestamp = new Date(published_at).getTime();
+  console.log(pubTimestamp);
   const pubDate = moment(published_at).format("MMMM Do YYYY, h:mm a");
 
   const document = {
@@ -45,6 +47,7 @@ const indexPostTypesense = async (post) => {
     "title": title,
     "authors": authorNames,
     "primary_author": primary_author.name,
+    "primary_author_facet": primary_author.name,
     "plaintext": plaintext,
     "tags": tagNames,
     "slug": slug,
@@ -52,6 +55,7 @@ const indexPostTypesense = async (post) => {
     "published_at": pubDate,
     "authors_facet": authorNames,
     "tags_facet": tagNames,
+    "main _tag_facet": mainTag
   };
 
   try {
@@ -73,7 +77,7 @@ const updateIndexPostTypesense = async (post) => {
 
   const path = `${slug}-${id}`;
   const tagNames = post.tags.map((t) => t.slug);
-
+  const mainTag = post.tags.filter(t => t.name != 'Front Page')[0].name
   try {
     await client.collections(collectionName)
         .documents(id).update({
@@ -82,6 +86,7 @@ const updateIndexPostTypesense = async (post) => {
           "tags": tagNames,
           "tags_facet": tagNames,
           "slug": slug,
+          "main _tag_facet": mainTag,
           "path": path,
         });
 
@@ -114,10 +119,12 @@ const createSchema = async (collection) => {
       {"name": "tags", "type": "string[]"},
       {"name": "slug", "type": "string"},
       {"name": "path", "type": "string"},
-      {"name": "published_timestamp", "type": "int32"},
+      {"name": "published_timestamp", "type": "int64", "facet": true},
       {"name": "published_at", "type": "string"},
       {"name": "authors_facet", "type": "string[]", "facet": true},
       {"name": "tags_facet", "type": "string[]", "facet": true},
+      {"name": "primary_author_facet", "type": "string", "facet": true},
+      {"name": "main _tag_facet", "type": "string", "facet": true},
     ],
     "default_sorting_field": "published_timestamp",
   };

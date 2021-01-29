@@ -32,7 +32,10 @@ search.addWidgets([
   instantsearch.widgets.searchBox({
     container: '#searchbox',
   }),
-
+  instantsearch.widgets.refinementList({
+    container: '#refinement-list',
+    attribute: 'primary_author',
+  }),
   instantsearch.widgets.hits({
     container: '#hits',
     templates: {

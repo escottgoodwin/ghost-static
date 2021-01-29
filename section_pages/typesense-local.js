@@ -47,7 +47,7 @@ const makeRangeWidget = instantsearch.connectors.connectRange(
         refine([start, actualEnd]);
       },
       // Some good parameters based on our dataset:
-      start_date: new Date('01/01/2021'),
+      start_date: new Date(),
       end_date: new Date('01/01/2022'),
       earliest_date: new Date('01/01/2019'),
       latest_date: new Date('01/01/2022'),
@@ -66,10 +66,6 @@ search.addWidgets([
   instantsearch.widgets.refinementList({
     container: '#author-refinement-list',
     attribute: 'primary_author_facet',
-  }),
-  instantsearch.widgets.refinementList({
-    container: '#section-refinement-list',
-    attribute: 'main _tag_facet',
   }),
   dateRangeWidget,
   instantsearch.widgets.hits({
