@@ -1,10 +1,33 @@
 const functions = require("firebase-functions");
+var admin = require("firebase-admin");
 
 const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
 const uploader = require("./renderers/uploader");
 const ts = require("./typesense");
 const {knex} = require("./mysql");
+
+var db = admin.database();
+
+const logUpdate = current => {
+
+  const { 
+    authors, 
+    title 
+  } = current
+
+  const now = new Date().getTime()
+
+  authors.forEach(a => {
+    const email = a.email.replace('@','_at_').replace('.','_dot_');
+    var ref = db.ref(email);
+    ref.set({
+      updated: now,
+      title
+    });
+  })
+  
+}
 
 // creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {
@@ -69,9 +92,10 @@ exports.createGhostPost = functions.https.onRequest(async (req, res) => {
   current.tags.forEach(async (tag) => {
     sectionRender.renderGhostSectionPage(tag);
   });
-
   // creates typesense index entry for post
   await ts.indexPostTypesense(current);
+
+  logUpdate(current);
 
   res.status(200).send("doc created");
 });
@@ -131,6 +155,8 @@ exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
 
   // remove from typesense index
   await ts.deleteFromIndex(id);
+
+  logUpdate(current);
 
   res.status(200).send("post deleted");
 });

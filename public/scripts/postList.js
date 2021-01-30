@@ -4,18 +4,12 @@ const name = document.querySelector('#name');
 
 document.addEventListener('DOMContentLoaded', () => {
   var functions = firebase.functions();
-
+  var db = firebase.database();
+  
   document.getElementById('quickstart-sign-in').addEventListener('click', signOut, false);
 
-  function signOut() {
-    firebase.auth().signOut();
-  }
-  
-   firebase.auth().onAuthStateChanged(user => { 
-    if (user) {
-      name.innerHTML = user.email
-
-      var addMessage = functions.httpsCallable('getAuthorDraftsCall');
+  function getPosts(){
+    var addMessage = functions.httpsCallable('getAuthorDraftsCall');
       
       addMessage()
         .then((result) => {
@@ -26,6 +20,30 @@ document.addEventListener('DOMContentLoaded', () => {
           draftList.innerHTML = drafts
           publishedList.innerHTML = published
         }); 
+  }
+
+  function signOut() {
+    firebase.auth().signOut();
+  }
+  
+   firebase.auth().onAuthStateChanged(user => { 
+    if (user) {
+      
+      const email = user.email.replace('@','_at_').replace('.','_dot_')
+      console.log(email)
+      var ref = db.ref(email);
+      name.innerHTML = user.email
+
+      getPosts();  
+
+      ref.on("value", snapshot => {
+        console.log(snapshot.val())
+        const data = snapshot.val();
+
+        if(data !== null){
+          getPosts(); 
+        }
+      })
 
     } else {
       window.location.href = "/";
