@@ -6,7 +6,7 @@ account_id = "8d4857c476b9ccbd2e136d988be81e8c"
 
 [env.production]
 # The ID of the domain deploying to
-zone_id = "ZONE-ID"
+zone_id = "0a8a64d36e7866c5da77c9aafcfb86ae"
 
 # The route pattern your Workers application will be served at
-route = "*YOUR-DOMAIN.com/*"
+route = "*evansgoodwin.com/*"

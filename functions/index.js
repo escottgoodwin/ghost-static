@@ -1,5 +1,5 @@
 const functions = require("firebase-functions");
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
 const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
@@ -7,27 +7,25 @@ const uploader = require("./renderers/uploader");
 const ts = require("./typesense");
 const {knex} = require("./mysql");
 
-var db = admin.database();
+const db = admin.database();
 
-const logUpdate = current => {
+const logUpdate = (current) => {
+  const {
+    authors,
+    title,
+  } = current;
 
-  const { 
-    authors, 
-    title 
-  } = current
+  const now = new Date().getTime();
 
-  const now = new Date().getTime()
-
-  authors.forEach(a => {
-    const email = a.email.replace('@','_at_').replace('.','_dot_');
-    var ref = db.ref(email);
+  authors.forEach((a) => {
+    const email = a.email.replace("@", "_at_").replace(".", "_dot_");
+    const ref = db.ref(email);
     ref.set({
       updated: now,
-      title
+      title,
     });
-  })
-  
-}
+  });
+};
 
 // creates predefined typesense schema
 exports.createSchema = functions.https.onRequest(async (req, res) => {

@@ -28,36 +28,6 @@ const search = instantsearch({
   indexName: 'ghost_posts',
 });
 
-const makeRangeWidget = instantsearch.connectors.connectRange(
-  (options, isFirstRendering) => {
-    if (!isFirstRendering) {
-      return;
-    }
-
-    const { refine } = options;
-
-    new Calendar({
-      element: $('#calendar'),
-      same_day_range: true,
-      callback: function() {
-        const start = new Date(this.start_date).getTime();
-        const end = new Date(this.end_date).getTime();
-        const actualEnd = start === end ? end + ONE_DAY_IN_MS - 1 : end;
-        console.log(start)
-        refine([start, actualEnd]);
-      },
-      // Some good parameters based on our dataset:
-      start_date: new Date('01/01/2021'),
-      end_date: new Date('01/01/2022'),
-      earliest_date: new Date('01/01/2019'),
-      latest_date: new Date('01/01/2022'),
-    });
-  }
-);
-
-const dateRangeWidget = makeRangeWidget({
-  attribute: 'published_timestamp',
-});
 
 search.addWidgets([
   instantsearch.widgets.searchBox({
@@ -71,7 +41,6 @@ search.addWidgets([
     container: '#section-refinement-list',
     attribute: 'main _tag_facet',
   }),
-  dateRangeWidget,
   instantsearch.widgets.hits({
     container: '#hits',
     templates: {

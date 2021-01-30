@@ -25,7 +25,7 @@ async function serveAsset(event) {
     // if route is domain root, serve the front page, otherwise serve file from google storage that matches route
     // route - http://www.example.com/listings.html 
     // google storage - http://storage.googleapis.com/example-bucket/listings.html
-    const bucketName = endsWithAny(imgExtensions, url.pathname) ? 'media' : 'static-times-published'
+    const bucketName = 'static-times-published'
     fullUrl = url.pathname==='/' ? `${BUCKET_URL}/${bucketName}/front-page.html` : `${BUCKET_URL}/${bucketName}/${url.pathname}`
     //reassign response from the cache response to the response from google storage
     response = await fetch(fullUrl)
