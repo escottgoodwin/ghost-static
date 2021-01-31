@@ -8,7 +8,7 @@ const ghostUrl = functions.config().ghost.url;
 // client for making queries to ghost database
 const ghostApi = new GhostContentAPI({
   url: local ? "http://localhost:8080" : ghostUrl,
-  key: local ? "f354b2450d8f9b04e72421c624" : ghostKey,
+  key: local ? "9800c3a2cbbbd2c9a500f49f5b" : ghostKey,
   version: "v3",
 });
 

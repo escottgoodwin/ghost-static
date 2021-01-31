@@ -53,6 +53,8 @@ exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
 
   postRender.renderUploadGhostDraft(current);
 
+  logUpdate(current);
+
   res.status(200).send("draft updated");
 });
 

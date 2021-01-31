@@ -61,7 +61,7 @@ const uploadFile = async (path) => {
 // update to drafts folder in fb storage and update real time db
 const uploadDraft = async (path, doc) => {
   fb.fbstorage.bucket()
-      .file(`${path}`)
+      .file(path)
       .save(doc, {
         gzip: true,
         metadata: {

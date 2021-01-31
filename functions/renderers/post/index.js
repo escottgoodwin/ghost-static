@@ -44,7 +44,7 @@ const renderUploadGhostPost = async (post)=> {
     // write render to temp storage
     uploader.writeHtml(path, newDoc);
 
-    // upload to storage
+    //upload to storage
     uploader.uploadFile(path);
   }
 };

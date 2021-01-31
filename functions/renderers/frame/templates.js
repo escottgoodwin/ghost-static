@@ -92,6 +92,7 @@ const frame = (content, path) => {
                 "description": "${description}"
             }
             </script>
+            <script src="/__/firebase/8.2.5/firebase-analytics.js"></script>
 
             <meta name="generator" content="Ghost 3.40" />
             <link rel="alternate" type="application/rss+xml" title="${title}" href="${url}/rss/" />
@@ -208,7 +209,9 @@ const renderSearchPage = () => {
             "description": "${description}"
         }
         </script>
-
+        <script src="/__/firebase/8.2.5/firebase-performance.js"></script>
+        <script src="/__/firebase/8.2.5/firebase-analytics.js"></script>
+        <script src="/__/firebase/init.js"></script>
         <meta name="generator" content="Ghost 3.40" />
         <link rel="alternate" type="application/rss+xml" title="${title}" href="${url}/rss/" />
 
