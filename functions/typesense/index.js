@@ -38,7 +38,7 @@ const indexPostTypesense = async (post) => {
   const tagNames = post.tags.map((t) => t.slug);
   const mainTag = post.tags.filter((t) => t.slug != "front-page")[0].name;
   const pubTimestamp = new Date(published_at).getTime();
-  console.log(pubTimestamp);
+
   const pubDate = moment(published_at).format("MMMM Do YYYY, h:mm a");
 
   const document = {

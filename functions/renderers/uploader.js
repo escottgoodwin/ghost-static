@@ -1,8 +1,12 @@
-const functions = require("firebase-functions");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const {Storage} = require("@google-cloud/storage");
-const fb = require("../firebase");
+const {
+  db,
+  fbstorage,
+  functions,
+} = require("../firebase");
+
 const storage = new Storage();
 
 const local = process.env.FUNCTIONS_EMULATOR;
@@ -16,12 +20,31 @@ const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/pu
 
 const bucket = storage.bucket(bucketName);
 
+const logUpdate = (current) => {
+  const {
+    authors,
+    title,
+  } = current;
+
+  const now = new Date().getTime();
+
+  authors.forEach((a) => {
+    const email = a.email.replace("@", "_at_").replace(".", "_dot_");
+    const ref = db.ref(email);
+    ref.set({
+      updated: now,
+      title,
+    });
+    console.log(`${title} updated in db for ${email}`);
+  });
+};
+
 // update realtime database
 const updateFBDoc = (fileName) => {
   const fbpath = fileName.replace(".html", "");
   const now = Date.now();
   console.log(`${fbpath} added to db`);
-  fb.db.ref(fbpath).set({
+  db.ref(fbpath).set({
     url: fileName,
     timestamp: now.toString(),
   });
@@ -47,7 +70,6 @@ const uploadFile = async (path) => {
       gzip: true,
       metadata: {
         contentType: "text/html; charset=utf-8",
-        cacheControl: "max-age=0, s-maxage=0", // indef CDN cache since we purge manually
       },
     });
     console.log(`${path} uploaded`);
@@ -60,7 +82,7 @@ const uploadFile = async (path) => {
 
 // update to drafts folder in fb storage and update real time db
 const uploadDraft = async (path, doc) => {
-  fb.fbstorage.bucket()
+  fbstorage.bucket()
       .file(path)
       .save(doc, {
         gzip: true,
@@ -111,4 +133,5 @@ module.exports = {
   purgeUrl,
   deleteHtml,
   writeHtml,
+  logUpdate,
 };

@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const functions = require("firebase-functions");
 
 // Initialize the app with a service account, granting admin privileges
 admin.initializeApp({
@@ -13,4 +14,5 @@ const fbstorage = admin.storage();
 module.exports = {
   db,
   fbstorage,
+  functions,
 };

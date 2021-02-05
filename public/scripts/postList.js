@@ -1,6 +1,6 @@
 const draftList = document.querySelector('#draft_list');
 const publishedList = document.querySelector('#published_list');
-const name = document.querySelector('#name');
+const userName = document.querySelector('#name');
 
 document.addEventListener('DOMContentLoaded', () => {
   var functions = firebase.functions();
@@ -9,16 +9,20 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('quickstart-sign-in').addEventListener('click', signOut, false);
 
   function getPosts(){
-    var addMessage = functions.httpsCallable('getAuthorDraftsCall');
+
+    var authorPosts = functions.httpsCallable('getAuthorPosts');
       
-      addMessage()
+    authorPosts()
         .then((result) => {
-    
-          const drafts = result.data.drafts.map(p => `<p><a href="preview.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`).join('')
-          const published = result.data.published.map(p => `<p><a href="preview.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`).join('')
+          const { drafts, published }  = result.data
   
-          draftList.innerHTML = drafts
-          publishedList.innerHTML = published
+          draftList.innerHTML = drafts.map(p => 
+            `<p><a href="preview.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`)
+            .join('')
+
+          publishedList.innerHTML = published.map(p => 
+            `<p><a href="preview.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`)
+            .join('')
         }); 
   }
 
@@ -28,16 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
   
    firebase.auth().onAuthStateChanged(user => { 
     if (user) {
-      
-      const email = user.email.replace('@','_at_').replace('.','_dot_')
-      console.log(email)
+      const email = user.email.replace('@','_at_').replace('.','_dot_');
+
       var ref = db.ref(email);
-      name.innerHTML = user.email
+      
+      userName.innerHTML = user.email;
 
       getPosts();  
 
       ref.on("value", snapshot => {
-        console.log(snapshot.val())
         const data = snapshot.val();
 
         if(data !== null){

@@ -4,18 +4,16 @@ const uploader = require("../uploader");
 const templates = require("./templates");
 
 // renders post from post info with article template
-const renderGhostPost = (post) => {
-  const {
-    html,
-    title,
-    feature_image,
-    excerpt,
-    published_at,
-    slug,
-    id,
-    primary_author,
-  } = post;
-
+const renderGhostPost = ({
+  html,
+  title,
+  feature_image,
+  excerpt,
+  published_at,
+  slug,
+  id,
+  primary_author,
+}) => {
   const path = `${slug}-${id}.html`;
   const pubDate = published_at ? moment(published_at).format("MMMM Do YYYY, h:mm a") : moment().format("MMMM Do YYYY, h:mm a");
 
@@ -44,7 +42,7 @@ const renderUploadGhostPost = async (post)=> {
     // write render to temp storage
     uploader.writeHtml(path, newDoc);
 
-    //upload to storage
+    // upload to storage
     uploader.uploadFile(path);
   }
 };

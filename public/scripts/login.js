@@ -17,20 +17,18 @@ function toggleSignIn() {
     }
     
     // Sign in with email and pass.
+
 firebase.auth().signInWithEmailAndPassword(email, password)
-    .catch(function(error) {
-        // Handle Errors here.
+    .catch(error => {
         var errorCode = error.code;
         var errorMessage = error.message;
         if (errorCode === 'auth/wrong-password') {
-        alert('Wrong password.');
+            alert('Wrong password.');
         } else {
-        alert(errorMessage);
+            alert(errorMessage);
         }
         console.log(error);
-        
     });
-    
 }
 
 /**
@@ -93,27 +91,17 @@ function sendPasswordReset() {
 
 
 function initApp() {
-    // Listening for auth state changes.
     document.getElementById('quickstart-sign-in').textContent = 'Sign in';
 
     firebase.auth().onAuthStateChanged(user => {
-    
         if (user) {
-            // User is signed in.
             window.location.href = "/post_list.html";
-        
         } else {
-            // User is signed out.
-            
             console.log('signed out')
-            
         }
-        
     });
-
     document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
     document.getElementById('quickstart-sign-up').addEventListener('click', handleSignUp, false);
-
 }
 
 window.onload = function() {

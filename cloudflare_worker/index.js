@@ -5,14 +5,6 @@ addEventListener("fetch", event => {
 
 const BUCKET_URL = `http://storage.googleapis.com`
 
-function endsWithAny(suffixes, string) {
-  return suffixes.some(function (suffix) {
-      return string.endsWith(suffix);
-  });
-}
-
-const imgExtensions = ['.jpg','.gif','.webp']
-
 async function serveAsset(event) {
   const url = new URL(event.request.url)
   const cache = caches.default
@@ -26,7 +18,7 @@ async function serveAsset(event) {
     // route - http://www.example.com/listings.html 
     // google storage - http://storage.googleapis.com/example-bucket/listings.html
     const bucketName = 'static-times-published'
-    fullUrl = url.pathname==='/' ? `${BUCKET_URL}/${bucketName}/front-page.html` : `${BUCKET_URL}/${bucketName}/${url.pathname}`
+    fullUrl = url.pathname==='/' ? `${BUCKET_URL}/${bucketName}/front-page.html` : `${BUCKET_URL}/${bucketName}${url.pathname}`
     //reassign response from the cache response to the response from google storage
     response = await fetch(fullUrl)
 
