@@ -14,9 +14,9 @@ const index = client.initIndex(collectionName);
 
 index.setSettings({
   attributesForFaceting: [
-    'primary_author_facet',
-    'mainTag',
-  ]
+    "primary_author_facet",
+    "mainTag",
+  ],
 }).then(() => {
   // done
 });
@@ -31,7 +31,6 @@ const indexPost = async ({
   primary_author,
   tags,
 }) => {
-
   const indexPost = {
     objectID: id,
     plaintext,
@@ -47,28 +46,27 @@ const indexPost = async ({
     tagNames: tags.map((t) => t.slug),
     mainTag: tags.filter((t) => t.slug != "front-page")[0].name,
     pubTimestamp: new Date(published_at).getTime(),
-    pubDate: moment(published_at).format("MMMM Do YYYY, h:mm a")
-  }
+    pubDate: moment(published_at).format("MMMM Do YYYY, h:mm a"),
+  };
 
   await index.saveObject(indexPost)
-  .then(({objectID}) => {
-    console.log(`Post indexed for ${collectionName}`, objectID);
-  });
+      .then(({objectID}) => {
+        console.log(`Post indexed for ${collectionName}`, objectID);
+      });
 };
 
 const deleteIndexPost = async (id) => {
-
   // Remove the object from Algolia
   await index
-  .deleteObject(id)
-  .then(() => {
-    console.log(`Post deleted from ${collectionName}`, id);
-  })
-  .catch(error => {
-    console.error(`Error when deleting contact from ${collectionName}`, error);
-    process.exit(1);
-  });
-}
+      .deleteObject(id)
+      .then(() => {
+        console.log(`Post deleted from ${collectionName}`, id);
+      })
+      .catch((error) => {
+        console.error(`Error when deleting contact from ${collectionName}`, error);
+        process.exit(1);
+      });
+};
 
 module.exports = {
   indexPost,

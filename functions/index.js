@@ -1,26 +1,12 @@
 const functions = require("firebase-functions");
+const path = require("path");
 
 const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
 const uploader = require("./renderers/uploader");
-const ts = require("./typesense");
 const algolia = require("./algolia");
-const {knex} = require("./mysql");
+const sizeImage = require("./sizeImage");
 const {ghostAdminApi} = require("./ghost");
-
-// creates predefined typesense schema
-exports.createSchema = functions.https.onRequest(async (req, res) => {
-  const {collectionName} = req.body;
-  const data = await ts.createSchema(collectionName);
-  res.status(200).send(JSON.stringify(data));
-});
-
-// deletes typesense schema
-exports.deleteSchema = functions.https.onRequest(async (req, res) => {
-  const {collectionName} = req.body;
-  const result = await ts.deleteSchema(collectionName);
-  res.status(200).send(result);
-});
 
 // fires on saved draft, triggers preview update
 exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
@@ -105,8 +91,7 @@ exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
       sectionRender.renderGhostSectionPage(tag);
     });
 
-    // index in typesense
-    await ts.updateIndexPostTypesense(current);
+    await algolia.indexPost(current);
   }
 
   res.status(200).send("doc updated");
@@ -137,10 +122,10 @@ exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
   });
 
   // remove from typesense index
-  //await ts.deleteFromIndex(id);
+  // await ts.deleteFromIndex(id);
 
   // remove from algolia index
-  await algolia.deleteIndexPost(id)
+  await algolia.deleteIndexPost(id);
 
   uploader.logUpdate(current);
 
@@ -164,10 +149,9 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context) => {
 });
 
 exports.getAuthorPosts1 = functions.https.onRequest(async (req, res) => {
-
   const {
     body: {
-     email
+      email,
     },
   } = req;
 
@@ -177,6 +161,43 @@ exports.getAuthorPosts1 = functions.https.onRequest(async (req, res) => {
   const data = {
     drafts,
     published,
-  }
+  };
   res.status(200).send(data);
+});
+
+exports.generateSizedImages = functions.storage.bucket("static-times-media").object().onFinalize((object) => {
+  const contentType = object.contentType; // File content type.
+
+  // Exit if this is triggered on a file that is not an image.
+  if (!contentType.startsWith("image/")) {
+    console.log("This is not an image.");
+    return null;
+  }
+
+  const filePath = object.name; // File path in the bucket.
+
+  const fileName = path.basename(filePath);
+
+  if (fileName.startsWith("staticsized_")) {
+    console.log(`Already sized for ${fileName}.`);
+    return null;
+  }
+
+  const imageSizes = [
+    {
+      imageHeight: 200,
+      imageWidth: 200,
+    },
+    {
+      imageHeight: 400,
+      imageWidth: 400,
+    },
+    {
+      imageHeight: 600,
+      imageWidth: 600,
+    },
+  ];
+
+  imageSizes.forEach((size) => sizeImage.sizeImage(object, size));
+  return "images generated";
 });
