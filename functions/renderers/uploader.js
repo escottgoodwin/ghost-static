@@ -120,18 +120,17 @@ const purgeUrl = async (path) => {
 };
 
 // deletes html file from google storage when unpublished and purges from cloudflare cache
-const deleteHtml = async (path) => {
-  const filename = path;
-  await bucket.file(filename).delete();
-  console.log(`${filename} deleted`);
-  return await purgeUrl(filename);
+const deletePostHtml = async (path) => {
+  await bucket.file(path).delete();
+  console.log(`${path} deleted`);
+  return await purgeUrl(path);
 };
 
 module.exports = {
   uploadFile,
   uploadDraft,
   purgeUrl,
-  deleteHtml,
+  deletePostHtml,
   writeHtml,
   logUpdate,
 };

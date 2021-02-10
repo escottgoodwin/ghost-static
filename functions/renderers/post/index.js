@@ -3,6 +3,8 @@ const moment = require("moment");
 const uploader = require("../uploader");
 const templates = require("./templates");
 
+const baseurl = "https://storage.googleapis.com/ghost-public-media/";
+
 // renders post from post info with article template
 const renderGhostPost = ({
   html,
@@ -15,16 +17,26 @@ const renderGhostPost = ({
   primary_author,
 }) => {
   const path = `${slug}-${id}.html`;
+
+  console.log(path);
+
   const pubDate = published_at ? moment(published_at).format("MMMM Do YYYY, h:mm a") : moment().format("MMMM Do YYYY, h:mm a");
+
+  const rootImageUrl = feature_image ? feature_image.slice(0, feature_image.lastIndexOf(".")).slice(feature_image.lastIndexOf("/")+1) : "";
+
+  const imgExtension = feature_image ? feature_image.slice(feature_image.lastIndexOf(".")) : "";
+
+  const fullUrl = baseurl + rootImageUrl;
 
   return templates.postTemplate({
     html,
     title,
-    excerpt,
-    feature_image,
     pubDate,
-    path,
+    excerpt,
     primary_author,
+    path,
+    imgExtension,
+    fullUrl,
   });
 };
 

@@ -4,18 +4,22 @@ const frametempate = require("../frame/templates");
 const postTemplate = ({
   html,
   title,
-  feature_image,
   pubDate,
   excerpt,
-  alltags,
   primary_author,
   path,
+  imgExtension,
+  fullUrl,
 }) => {
   const {
     name,
     slug,
     profile_image,
   } = primary_author;
+
+  // breakpoints= 360px, 480px, 736px, 980px, 1280px  1680px,
+
+  // 1280 w and above, image is 70 viewport width, below 1280 w image is 80 vw
 
   const article =`
     <section>
@@ -31,7 +35,17 @@ const postTemplate = ({
         </header>
 
         <div class="image main">
-            <img src="${feature_image}" alt="${title}" />
+            <img 
+                srcset="${fullUrl}-360-static2021${imgExtension} 312w,
+                        ${fullUrl}-480-static2021${imgExtension} 427w,
+                        ${fullUrl}-736-static2021${imgExtension} 683w,
+                        ${fullUrl}-980-static2021${imgExtension} 873w,
+                        ${fullUrl}-1280-static2021${imgExtension} 1173w,
+                        ${fullUrl}-1680-static2021${imgExtension} 1217w"
+                src="${fullUrl}-1280-static2021${imgExtension}"
+                sizes="(min-width: 1280w) 70vw, 90vw"
+                alt="${title}"
+            />
         </div>
 
         <div class="content">
@@ -58,7 +72,7 @@ const postTemplate = ({
 
     </section>`;
 
-  return frametempate.frame(article, alltags, path);
+  return frametempate.frame(article, path);
 };
 
 module.exports = {

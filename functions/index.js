@@ -1,12 +1,11 @@
 const functions = require("firebase-functions");
-const path = require("path");
 
 const postRender=require("./renderers/post");
 const sectionRender=require("./renderers/section");
 const uploader = require("./renderers/uploader");
 const algolia = require("./algolia");
 const sizeImage = require("./sizeImage");
-const {ghostAdminApi} = require("./ghost");
+const {knex} = require("./mysql");
 
 // fires on saved draft, triggers preview update
 exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
@@ -114,15 +113,12 @@ exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
   const path = `${slug}-${id}.html`;
 
   // delete article in storage
-  await uploader.deleteHtml(path);
+  await uploader.deletePostHtml(path);
 
   // update section pages with associated tags removing the article
   tags.forEach(async (tag) => {
     await sectionRender.renderGhostSectionPage(tag);
   });
-
-  // remove from typesense index
-  // await ts.deleteFromIndex(id);
 
   // remove from algolia index
   await algolia.deleteIndexPost(id);
@@ -132,15 +128,20 @@ exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
   res.status(200).send("post deleted");
 });
 
-
 // gets drafts and published posts by logged in author
 exports.getAuthorPosts = functions.https.onCall(async (data, context) => {
   const email = context.auth.token.email;
 
-  const posts = await ghostAdminApi.posts.browse({limit: 5, include: "authors", filter: "authors.email:"+email});
+  const results = await knex.select("p.id", "p.title", "p.slug", "p.status")
+      .from("posts as p")
+      .innerJoin("posts_authors as pa", "p.id", "=", "pa.post_id")
+      .innerJoin("users as u", "u.id", "=", "pa.author_id")
+      .where("u.email", email)
+      .orWhere("p.status", "published")
+      .orWhere("p.status", "draft");
 
-  const drafts = posts.filter((d) => d.status === "draft");
-  const published = posts.filter((d) => d.status === "published");
+  const drafts = results.filter((d) => d.status === "draft");
+  const published = results.filter((d) => d.status === "published");
 
   return {
     drafts,
@@ -148,56 +149,41 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context) => {
   };
 });
 
-exports.getAuthorPosts1 = functions.https.onRequest(async (req, res) => {
-  const {
-    body: {
-      email,
-    },
-  } = req;
-
-  const posts = await ghostAdminApi.posts.browse({limit: 5, include: "authors", filter: "authors.email:"+email});
-  const drafts = posts.filter((d) => d.status === "draft");
-  const published = posts.filter((d) => d.status === "published");
-  const data = {
-    drafts,
-    published,
-  };
-  res.status(200).send(data);
-});
-
 exports.generateSizedImages = functions.storage.bucket("static-times-media").object().onFinalize((object) => {
-  const contentType = object.contentType; // File content type.
-
-  // Exit if this is triggered on a file that is not an image.
-  if (!contentType.startsWith("image/")) {
-    console.log("This is not an image.");
-    return null;
-  }
-
-  const filePath = object.name; // File path in the bucket.
-
-  const fileName = path.basename(filePath);
-
-  if (fileName.startsWith("staticsized_")) {
-    console.log(`Already sized for ${fileName}.`);
-    return null;
-  }
-
-  const imageSizes = [
+  const sizes = [
     {
-      imageHeight: 200,
-      imageWidth: 200,
+      name: "360",
+      width: 312,
     },
     {
-      imageHeight: 400,
-      imageWidth: 400,
+      name: "480",
+      width: 427,
     },
     {
-      imageHeight: 600,
-      imageWidth: 600,
+      name: "736",
+      width: 683,
+    },
+    {
+      name: "980",
+      width: 873,
+    },
+    {
+      name: "1280",
+      width: 1173,
+    },
+    {
+      name: "1680",
+      width: 1217,
     },
   ];
 
-  imageSizes.forEach((size) => sizeImage.sizeImage(object, size));
+  // 1680 x 1217 = .72
+  // 1280 : 1173  = .92
+  // 980 : 873 = .89
+  // 736 : 683 = .92
+  // 480 : 427 = .89
+  // 360 : 312 = .87
+
+  sizes.forEach((size) => sizeImage.sizeImage(object, size));
   return "images generated";
 });
