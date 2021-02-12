@@ -18,7 +18,31 @@ const siteUrl = functions.config().cdn.url;
 
 const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`;
 
+// const ORIGIN = "static-times.web.app";
+
 const bucket = storage.bucket(bucketName);
+
+// write and purge fb hosting
+// async function writeAndPurge(path, doc) {
+//   // write and purge fb hosting
+//   await storage
+//       .bucket()
+//       .file(path)
+//       .save(doc, {
+//         gzip: true,
+//         metadata: {
+//           contentType: "text/html; charset=utf-8",
+//           cacheControl: "max-age=0, s-maxage=31536000", // indef CDN cache since we purge manually
+//         },
+//       });
+//   console.log("wrote storage file", path);
+
+//   // write and purge fb hosting
+//   const purgeUrl = `${ORIGIN}/${path}`;
+//   await fetch(purgeUrl, {method: "PURGE"});
+//   console.log("purged URL", purgeUrl);
+//   return;
+// }
 
 const logUpdate = (current) => {
   const {
@@ -59,8 +83,17 @@ const writeHtml = (path, newDoc) => {
   });
 };
 
+// deletes temporary file
+const deleteHtml = (path) => {
+  const filepath = `/tmp/${path}`;
+  fs.unlink(filepath, (err) => {
+    if (err) throw err;
+    console.log(`successfully deleted ${filepath}`);
+  });
+};
+
 // uploads to google storage from temporary file and purges cloudflare cache
-// sets cache for 30 seconds and cloudflare cache for a year -
+// sets browser cache for 0 seconds and the cloudflare cache for a year -
 // all subsequent requests for url will come directly from the cache for the next year
 // until page is updated and cache is purged
 const uploadFile = async (path) => {
@@ -70,6 +103,7 @@ const uploadFile = async (path) => {
       gzip: true,
       metadata: {
         contentType: "text/html; charset=utf-8",
+        cacheControl: "max-age=0, s-maxage=31536000",
       },
     });
     console.log(`${path} uploaded`);
@@ -132,5 +166,7 @@ module.exports = {
   purgeUrl,
   deletePostHtml,
   writeHtml,
+  deleteHtml,
   logUpdate,
+  // writeAndPurge,
 };

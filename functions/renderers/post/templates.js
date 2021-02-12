@@ -21,9 +21,10 @@ const postTemplate = ({
 
   // 1280 w and above, image is 70 viewport width, below 1280 w image is 80 vw
 
+  // main content, date, content, image main, post footer, authors, author-box,
+  // post-footer, author-profile-image, author-box-content, author-box-name,
   const article =`
     <section>
-
         <header class="main content">
             <span class="date">${pubDate}</span>
             <h1>
@@ -33,7 +34,6 @@ const postTemplate = ({
                 ${excerpt}
             </p>
         </header>
-
         <div class="image main">
             <img 
                 srcset="${fullUrl}-360-static2021${imgExtension} 312w,
@@ -47,16 +47,13 @@ const postTemplate = ({
                 alt="${title}"
             />
         </div>
-
         <div class="content">
             ${html}
         </div>
-
         <footer class="post-footer">
-
             <div class="authors">
                 <a class="author-box" href="${slug}.html">
-                    <img class="author-profile-image" src="${profile_image}" alt="Ghost" />
+                    <img class="author-profile-image" src="${profile_image}" alt="${name}" />
                     <section class="author-box-content">
                         <div class="author-box-label">
                             Author
@@ -67,12 +64,10 @@ const postTemplate = ({
                     </section>
                 </a>
             </div>
-
         </footer>
-
     </section>`;
 
-  return frametempate.frame(article, path);
+  return frametempate.frame(article, path, title);
 };
 
 module.exports = {

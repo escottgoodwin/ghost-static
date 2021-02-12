@@ -7,6 +7,9 @@
       "hosting": {
         "ghost-static": [
           "ghost-static"
+        ],
+        "static-times": [
+          "static-times"
         ]
       }
     }

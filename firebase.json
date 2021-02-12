@@ -15,7 +15,17 @@
       "**/.*",
       "**/node_modules/**"
     ]
-  }],
+  },
+  {
+    "target": "static-times", 
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+],
   "emulators": {
     "auth": {
       "port": 9099

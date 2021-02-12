@@ -10,7 +10,8 @@ const authorTemplate = ({
   const postlist = posts.length>0 ? posts.map((p) => postLink(p)).join("") : "<div></div>";
 
   const postCount = posts.length === 1 ? `${posts.length} post` : `${posts.length} posts`;
-
+  // author-header, author-profile-image, author-meta, author-stats, label, posts, major, image fit, actions special, button, banner,
+  // actions, button big, image object
   const template = `
         <header class="author-header">
             <img class="author-profile-image" src="${profile_image}" alt="${name}" />
@@ -23,20 +24,21 @@ const authorTemplate = ({
                 <div class="author-stats">
                     ${postCount} <span class="bull">&bull;</span>
                 </div>
-                <a href="https://feedly.com/i/subscription/feed/https://editorial.ghost.io/author/team/rss/" class="icon fa-rss" target="_blank" rel="noopener"><span class="label" title="RSS">RSS</span></a>
+                <a href="https://feedly.com/i/subscription/feed/https://editorial.ghost.io/author/team/rss/" class="icon fa-rss" target="_blank" rel="noopener">
+                    <span class="label" title="RSS">
+                        RSS
+                    </span>
+                </a>
             </div>
         </header>
-
         <section class="posts">
             ${postlist}
         </section>
-
         <footer>
-            
         </footer>
     `;
 
-  return frameTemplate.frame(template, path);
+  return frameTemplate.frame(template, path, name);
 };
 
 // generate section
@@ -46,38 +48,40 @@ const sectionTemplate = ({
   path,
 }) => {
   const postlist = posts.length>0 ? posts.slice(1).map((p) => postLink(p)).join("") : "<div></div>";
+
   const featuredPost1 = posts.length>0 ? featuredPost(posts[0]) : "<div></div>";
 
   const template = `
         ${featuredPost1}
         <section>
-
             <header class="major">
                 <h2>
                     ${name}
                 </h2>
             </header>
-
             <section class="posts">
                 ${postlist}
             </section>
-
         </section>
         <footer>
-            
         </footer>
     `;
 
-  return frameTemplate.frame(template, path);
+  return frameTemplate.frame(template, path, name);
 };
 
 // generate link
-const postLink = ({slug, id, title, excerpt, feature_image}) => {
-  const url = `${slug}-${id}.html`;
+const postLink = ({
+  id,
+  title,
+  excerpt,
+  feature_image,
+}) => {
+  const url = `${id}.html`;
   return `
         <article>
             <a href="${url}" class="image fit">
-                <img src="${feature_image}" alt="Welcome to Ghost" />
+                <img src="${feature_image}" alt="${title}" />
             </a>
             <h3>
                 <a href="${url}">
@@ -99,8 +103,13 @@ const postLink = ({slug, id, title, excerpt, feature_image}) => {
 };
 
 // generate post
-const featuredPost = ({slug, id, title, excerpt, feature_image}) => {
-  const url = `${slug}-${id}.html`;
+const featuredPost = ({
+  id,
+  title,
+  excerpt,
+  feature_image,
+}) => {
+  const url = `${id}.html`;
   return `
     <article id="banner">
         <div class="content">
@@ -123,7 +132,7 @@ const featuredPost = ({slug, id, title, excerpt, feature_image}) => {
             </ul>
         </div>
         <a href="${url}" class="image object">
-            <img src="${feature_image}" alt="Editorial Theme for Ghost" />
+            <img src="${feature_image}" alt="${title}" />
         </a>
     </article>
     `;

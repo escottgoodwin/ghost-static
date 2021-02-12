@@ -23,7 +23,7 @@ async function serveAsset(event) {
     response = await fetch(fullUrl)
 
     //serve and cache response for a year
-    const headers = { "cache-control": "public, max-age=30, s-maxage=31536000" }
+    const headers = { "Cache-Control": "max-age=0, s-maxage=31536000", }
     response = new Response(response.body, { ...response, headers })
     event.waitUntil(cache.put(event.request, response.clone()))
   }
