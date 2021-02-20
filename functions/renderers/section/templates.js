@@ -1,5 +1,7 @@
 const frameTemplate = require("../frame/templates");
 
+const baseurl = "https://storage.googleapis.com/ghost-public-media/";
+
 // generate author
 const authorTemplate = ({
   name,
@@ -7,11 +9,12 @@ const authorTemplate = ({
   posts,
   path,
 }) => {
+  const pageStyle = "section";
+
   const postlist = posts.length>0 ? posts.map((p) => postLink(p)).join("") : "<div></div>";
 
   const postCount = posts.length === 1 ? `${posts.length} post` : `${posts.length} posts`;
-  // author-header, author-profile-image, author-meta, author-stats, label, posts, major, image fit, actions special, button, banner,
-  // actions, button big, image object
+
   const template = `
         <header class="author-header">
             <img class="author-profile-image" src="${profile_image}" alt="${name}" />
@@ -38,7 +41,10 @@ const authorTemplate = ({
         </footer>
     `;
 
-  return frameTemplate.frame(template, path, name);
+  return {
+    authorDoc: frameTemplate.frame(template, path, name, pageStyle),
+    authorDocFb: frameTemplate.framefb(template, path, name, pageStyle),
+  };
 };
 
 // generate section
@@ -47,6 +53,8 @@ const sectionTemplate = ({
   posts,
   path,
 }) => {
+  const pageStyle = "section";
+
   const postlist = posts.length>0 ? posts.slice(1).map((p) => postLink(p)).join("") : "<div></div>";
 
   const featuredPost1 = posts.length>0 ? featuredPost(posts[0]) : "<div></div>";
@@ -67,7 +75,10 @@ const sectionTemplate = ({
         </footer>
     `;
 
-  return frameTemplate.frame(template, path, name);
+  return {
+    sectionDoc: frameTemplate.frame(template, path, name, pageStyle),
+    sectionDocFb: frameTemplate.framefb(template, path, name, pageStyle),
+  };
 };
 
 // generate link
@@ -78,10 +89,33 @@ const postLink = ({
   feature_image,
 }) => {
   const url = `${id}.html`;
+
+  const rootImageUrl = feature_image ? feature_image.slice(0, feature_image.lastIndexOf(".")).slice(feature_image.lastIndexOf("/")+1) : "";
+
+  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+  const imgExtension = feature_image ? feature_image.slice(feature_image.lastIndexOf(".")) : "";
+
+  // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
+  const fullUrl = baseurl + rootImageUrl;
+
   return `
         <article>
             <a href="${url}" class="image fit">
-                <img src="${feature_image}" alt="${title}" />
+            <img 
+                srcset="${fullUrl}_312${imgExtension} 312w,
+                ${fullUrl}_397${imgExtension} 397w,
+                ${fullUrl}_427${imgExtension} 427w,
+                ${fullUrl}_574${imgExtension} 574w,
+                ${fullUrl}_683${imgExtension} 683w,
+                ${fullUrl}_873${imgExtension} 873w,
+                ${fullUrl}_1173${imgExtension} 1173w,
+                ${fullUrl}_1217${imgExtension} 1217w"
+            src="${fullUrl}_1173${imgExtension}"
+                sizes="(min-width: 1680px) 33vw, 
+                       (min-width: 736px) 40vw, 
+                        90vw"
+                alt="${title}"
+            />
             </a>
             <h3>
                 <a href="${url}">
@@ -110,6 +144,15 @@ const featuredPost = ({
   feature_image,
 }) => {
   const url = `${id}.html`;
+
+  const rootImageUrl = feature_image ? feature_image.slice(0, feature_image.lastIndexOf(".")).slice(feature_image.lastIndexOf("/")+1) : "";
+
+  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+  const imgExtension = feature_image ? feature_image.slice(feature_image.lastIndexOf(".")) : "";
+
+  // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
+  const fullUrl = baseurl + rootImageUrl;
+
   return `
     <article id="banner">
         <div class="content">
@@ -132,7 +175,21 @@ const featuredPost = ({
             </ul>
         </div>
         <a href="${url}" class="image object">
-            <img src="${feature_image}" alt="${title}" />
+            <img 
+            <img 
+                srcset="${fullUrl}_312${imgExtension} 312w,
+                ${fullUrl}_397${imgExtension} 397w,
+                ${fullUrl}_427${imgExtension} 427w,
+                ${fullUrl}_574${imgExtension} 574w,
+                ${fullUrl}_683${imgExtension} 683w,
+                ${fullUrl}_873${imgExtension} 873w,
+                ${fullUrl}_1173${imgExtension} 1173w,
+                ${fullUrl}_1217${imgExtension} 1217w"
+            src="${fullUrl}_1173${imgExtension}"
+            sizes="(min-width: 620px) 45vw, 
+                    90vw"
+            alt="${title}"
+        />
         </a>
     </article>
     `;

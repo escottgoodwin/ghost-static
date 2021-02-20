@@ -7,7 +7,8 @@
       "npm --prefix \"$RESOURCE_DIR\" run lint"
     ]
   },
-  "hosting": [{
+  "hosting": [
+    {
     "target": "ghost-static", 
     "public": "public",
     "ignore": [
@@ -16,13 +17,26 @@
       "**/node_modules/**"
     ]
   },
-  {
+  { 
     "target": "static-times", 
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
+    "public": "static",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { 
+        "source": "**", 
+        "function": "expressHandler" 
+      }
+    ],
+    "headers": [
+      {
+        "source": "/images/*",
+        "headers": [
+          { 
+            "key": "Cache-Control", 
+            "value": "max-age=31536000" 
+          }
+        ]
+      }
     ]
   }
 ],

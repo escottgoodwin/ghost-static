@@ -3,6 +3,8 @@ const sharp = require("sharp");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 
+sharp.cache(false);
+
 // bucket name where we upload the resized images4
 const publicUploadBucket = functions.config().gcs.publicupload;
 
@@ -37,7 +39,10 @@ const sizeImage = async (object, size) => {
   // Get the file name.
   const fileBucket = object.bucket; // The Storage bucket that contains the file.
   const filePath = object.name; // File path in the bucket.
-
+  if (filePath.includes("_o-")) {
+    console.log("filtered image");
+    return;
+  }
   // bucket where the image is uploaded from ghost that we use to create our sized images
   const bucket = gcs.bucket(fileBucket);
 
@@ -91,7 +96,6 @@ const sizeImage = async (object, size) => {
   return new Promise((resolve, reject) =>
     sizedUploadStream.on("finish", resolve).on("error", reject));
 };
-
 module.exports = {
   sizeImage,
 };

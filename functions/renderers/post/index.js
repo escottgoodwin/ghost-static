@@ -17,8 +17,6 @@ const renderGhostPost = ({
 }) => {
   const path = `${id}.html`;
 
-  console.log(path);
-
   const pubDate = published_at ? moment(published_at).format("MMMM Do YYYY, h:mm a") : moment().format("MMMM Do YYYY, h:mm a");
 
   // get image root file name - from 2021/2/1/image-file.jpg => image-file
@@ -50,14 +48,16 @@ const renderUploadGhostPost = async (post)=> {
   const filepath = `/tmp/${path}`;
 
   // generate html from template
-  const newDoc = renderGhostPost(post);
+  const {postDoc, postDocFb} = renderGhostPost(post);
 
-  if (filepath && newDoc) {
+  if (filepath && postDoc) {
     // write render to temp storage
-    uploader.writeHtml(path, newDoc);
+    uploader.writeHtml(path, postDoc);
 
     // upload to storage
-    uploader.uploadFile(path);
+    await uploader.uploadFile(path);
+
+    await uploader.uploadFile1(path, postDocFb);
   }
 };
 
@@ -68,9 +68,10 @@ const renderUploadGhostDraft = async (post)=> {
   const path = `${id}.html`;
 
   // generate html from template
-  const newDoc = renderGhostPost(post);
+  const {postDoc} = renderGhostPost(post);
   // write render upload to storage
-  uploader.uploadDraft(path, newDoc, name, email);
+  uploader.uploadDraft(path, postDoc, name, email);
+
 
   // delete temp rendered html file
 };

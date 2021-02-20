@@ -7,18 +7,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-  const slug = urlParams.get('slug')
+  const id = urlParams.get('id')
 
   function loadPage(path){
     var pathReference = storage.ref(path);
   
     pathReference.getDownloadURL().then(url => {
+      console.log(url)
         const iframe = `<iframe src="${url}" title="Ghost Preview" height="700" ></iframe>`
         current.innerHTML = iframe;
       });
   }
 
-  var ref = db.ref(slug);
+  var ref = db.ref(id);
 
   auth.onAuthStateChanged(user => { 
     if (user) {
@@ -26,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ref.on("value", snapshot => {
         
         const data = snapshot.val();
-
+        console.log(data)
         if(data !== null){
-            loadPage(`${slug}.html`)
+            loadPage(`${id}.html`)
           } else {
-            loadPage(`loading.htm`)
+            loadPage(`loading.html`)
           }
         })
       } else {

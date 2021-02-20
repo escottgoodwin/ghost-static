@@ -9,13 +9,15 @@ const renderGhostSectionPage = async ({name, slug}) => {
   const posts = await ghostApi.posts.browse({limit: 5, include: "tags,authors", filter: "tag:"+slug});
 
   // renders section page with all posts - business page with all business posts
-  const sectionPage = templates.sectionTemplate({name, posts, path});
+  const {sectionDoc, sectionDocFb} = templates.sectionTemplate({name, posts, path});
 
   // writes to temporary storage
-  uploader.writeHtml(path, sectionPage);
+  uploader.writeHtml(path, sectionDoc);
 
   // uploads from temporary storage
-  uploader.uploadFile(path);
+  await uploader.uploadFile(path);
+
+  await uploader.uploadFile1(path, sectionDocFb);
 };
 
 const renderGhostAuthorPage = async ({name, slug, profile_image}) => {
@@ -25,13 +27,15 @@ const renderGhostAuthorPage = async ({name, slug, profile_image}) => {
   const posts = await ghostApi.posts.browse({limit: 5, include: "tags,authors", filter: "primary_author:"+slug});
 
   // renders section page with all posts - business page with all business posts
-  const sectionPage = templates.authorTemplate({name, profile_image, posts, path});
+  const {authorDoc, authorDocFb} = templates.authorTemplate({name, profile_image, posts, path});
 
   // writes to temporary storage
-  uploader.writeHtml(path, sectionPage);
+  uploader.writeHtml(path, authorDoc);
 
-  // uploads from temporary storage
-  uploader.uploadFile(path);
+  // uploads from temporary stora
+  await uploader.uploadFile(path);
+
+  await uploader.uploadFile1(path, authorDocFb);
 };
 
 module.exports = {

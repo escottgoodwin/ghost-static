@@ -13,36 +13,15 @@ const local = process.env.FUNCTIONS_EMULATOR;
 const cfAuthKey = functions.config().cloudflare.authkey;
 const cfZoneId = functions.config().cloudflare.zoneid;
 const cfEmail = functions.config().cloudflare.email;
-const bucketName = local ? "static-times-local" : functions.config().bucket.name;
+const bucketName = local ? functions.config().gcs.cfuploadlocal : functions.config().gcs.cfupload;
+const fbBucketName = functions.config().gcs.fbupload;
 const siteUrl = functions.config().cdn.url;
 
 const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`;
 
-// const ORIGIN = "static-times.web.app";
+const ORIGIN = "https://static-times.web.app";
 
 const bucket = storage.bucket(bucketName);
-
-// write and purge fb hosting
-// async function writeAndPurge(path, doc) {
-//   // write and purge fb hosting
-//   await storage
-//       .bucket()
-//       .file(path)
-//       .save(doc, {
-//         gzip: true,
-//         metadata: {
-//           contentType: "text/html; charset=utf-8",
-//           cacheControl: "max-age=0, s-maxage=31536000", // indef CDN cache since we purge manually
-//         },
-//       });
-//   console.log("wrote storage file", path);
-
-//   // write and purge fb hosting
-//   const purgeUrl = `${ORIGIN}/${path}`;
-//   await fetch(purgeUrl, {method: "PURGE"});
-//   console.log("purged URL", purgeUrl);
-//   return;
-// }
 
 const logUpdate = (current) => {
   const {
@@ -96,6 +75,36 @@ const deleteHtml = (path) => {
 // sets browser cache for 0 seconds and the cloudflare cache for a year -
 // all subsequent requests for url will come directly from the cache for the next year
 // until page is updated and cache is purged
+
+const uploadFile1 = async (path, doc) => {
+  await storage
+      .bucket(fbBucketName)
+      .file(path)
+      .save(doc, {
+        gzip: true,
+        metadata: {
+          contentType: "text/html; charset=utf-8",
+          cacheControl: "max-age=0, s-maxage=31536000", // indef CDN cache since we purge manually
+        },
+      });
+
+  console.log(`${path} uploaded fb`);
+
+  updateFBDoc(path);
+
+  const purgeUrl = `${ORIGIN}/${path}`;
+  await fetch(purgeUrl, {method: "PURGE"});
+  console.log(`purged fb ${purgeUrl }`);
+  if (path === "front-page.html") {
+    const purgeRoot = `${ORIGIN}/`;
+    await fetch(purgeRoot, {method: "PURGE"});
+    console.log(`purged fb ${purgeRoot}`);
+  }
+
+
+  return;
+};
+
 const uploadFile = async (path) => {
   const filepath = `/tmp/${path}`;
   try {
@@ -107,7 +116,9 @@ const uploadFile = async (path) => {
       },
     });
     console.log(`${path} uploaded`);
+
     updateFBDoc(path);
+
     return await purgeUrl(path);
   } catch (error) {
     console.log(error);
@@ -149,13 +160,14 @@ const purgeUrl = async (path) => {
     },
     method: "POST",
   });
-  console.log(`${purgeUrl} purged`);
+  console.log(`${purgeUrl} cf purged`);
   return response;
 };
 
 // deletes html file from google storage when unpublished and purges from cloudflare cache
 const deletePostHtml = async (path) => {
   await bucket.file(path).delete();
+  await bucket.file(fbBucketName).delete();
   console.log(`${path} deleted`);
   return await purgeUrl(path);
 };
@@ -168,5 +180,6 @@ module.exports = {
   writeHtml,
   deleteHtml,
   logUpdate,
-  // writeAndPurge,
+  uploadFile1,
+
 };

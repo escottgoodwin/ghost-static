@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
           const { drafts, published }  = result.data
   
           draftList.innerHTML = drafts.map(p => 
-            `<p><a href="preview.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`)
+            `<p><a href="preview.html?id=${p.id}" target="_blank">${p.title}</a></p>`)
             .join('')
 
           publishedList.innerHTML = published.map(p => 
-            `<p><a href="preview.html?slug=${p.slug}-${p.id}" target="_blank">${p.title}</a></p>`)
+            `<p><a href="preview.html?id=${p.id}" target="_blank">${p.title}</a></p>`)
             .join('')
         }); 
   }
