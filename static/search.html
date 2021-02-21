@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" /> 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<title>Static Times</title>
+<title>Search - Static Times</title>
 <meta name="HandheldFriendly" content="True" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="shortcut icon" href="/assets/favicon.png">
@@ -16,44 +16,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@7.3.1/themes/algolia-min.css" integrity="sha256-HB49n/BZjuqiCtQQf49OdZn63XuKFaxcIHWf0HNKte8=" crossorigin="anonymous">
 
 <meta name="description" content="News about the static world." />
-<link rel="canonical" href="https://www.evansgoodwin.com/search.html" />
 <meta name="referrer" content="no-referrer-when-downgrade" />
-<meta property="og:site_name" content="Static Times" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="https://www.evansgoodwin.com" />
-<meta property="og:description" content="News about the static world." />
-<meta property="og:url" content="https://www.evansgoodwin.com/" />
-<meta property="article:publisher" content="https://www.facebook.com/ghost" />
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:title" content="Static Times" />
-<meta name="twitter:description" content="News about the static world." />
-<meta name="twitter:url" content="https://www.evansgoodwin.com" />
-<meta name="twitter:site" content="https://twitter.com/tryghost" />
-<script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "publisher": {
-                "@type": "Organization",
-                "name": "News about the static world.",
-                "url": "https://www.evansgoodwin.com",
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": "https://cdn.jsdelivr.net/gh/escottgoodwin/ghost-static/assets/favicon.png",
-                    "width": 48,
-                    "height": 48
-                }
-            },
-            "url": "https://www.evansgoodwin.com/",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": "https://www.evansgoodwin.com/"
-            },
-            "description": "News about the static world."
-        }
-        </script>
-<meta name="generator" content="Ghost 3.40" />
-<link rel="alternate" type="application/rss+xml" title="Static Times" href="https://www.evansgoodwin.com/rss/" />
+
 </head>
 <body class="is-preload home-template">
     <div id="wrapper">
@@ -80,8 +44,14 @@
                         </div>
                     </td>
                     <td width="75%">
-                        <div id="searchbox"></div>
+
+                        <section id="search" class="alt">
+                            <form method="post" action="#">
+                                <input type="text" name="searchBox" id="searchBox" placeholder="Search" />
+                            </form>
+                        </section>
                         <ul id="hits" class="hits-container"></ul>
+                        <div id="pagination"></div>
                     </td>
                 </tr>
             </table>
@@ -108,45 +78,7 @@
 </div>
     <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.5.1/dist/algoliasearch-lite.umd.js" integrity="sha256-EXPXz4W6pQgfYY3yTpnDa3OH8/EPn16ciVsPQ/ypsjk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.8.3/dist/instantsearch.production.min.js" integrity="sha256-LAGhRRdtVoD6RLo2qDQsU2mp+XVSciKRC8XPOBWmofM=" crossorigin="anonymous"></script>
-    <script>
-        const searchClient = algoliasearch('RDHTAZM1DM', '91a45d40f008b8913962712992a694a5');
-
-        const search = instantsearch({
-        indexName: 'ghost_posts',
-        searchClient,
-        });
-
-        search.addWidgets([
-            instantsearch.widgets.searchBox({
-            container: '#searchbox',
-            }),
-            instantsearch.widgets.refinementList({
-            container: '#author-refinement-list',
-            attribute: 'primary_author_facet',
-            }),
-            instantsearch.widgets.refinementList({
-            container: '#section-refinement-list',
-            attribute: 'mainTag',
-            }),
-            instantsearch.widgets.hits({
-            container: '#hits',
-            templates: {
-                item: 
-                `<div style="font-size:10px; color:#8F8F8F;">{{ pubDate }}</div>
-                <a href="{{ objectID }}.html"
-                    <h4>
-                    {{#helpers.highlight}}{ "attribute": "title" }{{/helpers.highlight}}
-                    </h4>
-                </a>
-                <p>{{ primary_author_facet }}</p>
-                `,
-            },
-            })
-        ]);
-
-        search.start();
-    </script>
-    
+    <script src="/assets/js/algolia.js"></script>
     <script src="/assets/js/jquery-3.5.1.min.js"></script>
     <script src="/assets/js/browser.min.js"></script>
     <script src="/assets/js/breakpoints.min.js"></script>
