@@ -1,9 +1,18 @@
+const functions = require("firebase-functions");
 const moment = require("moment");
+const {postTemplate} = require("./post_template");
 
-const uploader = require("../uploader");
-const templates = require("./templates");
+const {
+  uploadFile,
+  uploadFileFB,
+  writeHtml,
+  uploadDraft,
+} = require("../uploader");
 
-const baseurl = "https://storage.googleapis.com/ghost-public-media/";
+const { 
+  imageExt, 
+  resizedImageUrl,
+} = require("../../util");
 
 // renders post from post info with article template
 const renderGhostPost = ({
@@ -19,16 +28,12 @@ const renderGhostPost = ({
 
   const pubDate = published_at ? moment(published_at).format("MMMM Do YYYY, h:mm a") : moment().format("MMMM Do YYYY, h:mm a");
 
-  // get image root file name - from 2021/2/1/image-file.jpg => image-file
-  const rootImageUrl = feature_image ? feature_image.slice(0, feature_image.lastIndexOf(".")).slice(feature_image.lastIndexOf("/")+1) : "";
-
-  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
-  const imgExtension = feature_image ? feature_image.slice(feature_image.lastIndexOf(".")) : "";
-
   // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
-  const fullUrl = baseurl + rootImageUrl;
+  const fullUrl = resizedImageUrl(feature_image);
+  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+  const imgExtension = imageExt(feature_image);
 
-  return templates.postTemplate({
+  return postTemplate({
     html,
     title,
     pubDate,
@@ -52,12 +57,12 @@ const renderUploadGhostPost = async (post)=> {
 
   if (filepath && postDoc) {
     // write render to temp storage
-    uploader.writeHtml(path, postDoc);
+    writeHtml(path, postDoc);
 
     // upload to storage
-    await uploader.uploadFile(path);
+    await uploadFile(path);
 
-    await uploader.uploadFile1(path, postDocFb);
+    await uploadFileFB(path, postDocFb);
   }
 };
 
@@ -70,7 +75,7 @@ const renderUploadGhostDraft = async (post)=> {
   // generate html from template
   const {postDoc} = renderGhostPost(post);
   // write render upload to storage
-  uploader.uploadDraft(path, postDoc, name, email);
+  uploadDraft(path, postDoc, name, email);
 
 
   // delete temp rendered html file

@@ -1,5 +1,10 @@
-const uploader = require("../uploader");
-const templates = require("./templates");
+const {
+  uploadFile,
+  uploadFileFB,
+  writeHtml,
+} = require("../uploader");
+
+const {sectionTemplate} = require("./section_template");
 const {ghostApi} = require("../../ghost");
 
 const renderGhostSectionPage = async ({name, slug}) => {
@@ -9,36 +14,18 @@ const renderGhostSectionPage = async ({name, slug}) => {
   const posts = await ghostApi.posts.browse({limit: 5, include: "tags,authors", filter: "tag:"+slug});
 
   // renders section page with all posts - business page with all business posts
-  const {sectionDoc, sectionDocFb} = templates.sectionTemplate({name, posts, path});
+  const {sectionDoc, sectionDocFb} = sectionTemplate({name, posts, path});
 
   // writes to temporary storage
-  uploader.writeHtml(path, sectionDoc);
+  writeHtml(path, sectionDoc);
 
-  // uploads from temporary storage
-  await uploader.uploadFile(path);
+  // uploads from temporary to gcs
+  await uploadFile(path);
 
-  await uploader.uploadFile1(path, sectionDocFb);
-};
-
-const renderGhostAuthorPage = async ({name, slug, profile_image}) => {
-  const path = `${slug}.html`;
-
-  //  gets all posts where tag matches slug (for the section page) - limited to 5 articles per template layout
-  const posts = await ghostApi.posts.browse({limit: 5, include: "tags,authors", filter: "primary_author:"+slug});
-
-  // renders section page with all posts - business page with all business posts
-  const {authorDoc, authorDocFb} = templates.authorTemplate({name, profile_image, posts, path});
-
-  // writes to temporary storage
-  uploader.writeHtml(path, authorDoc);
-
-  // uploads from temporary stora
-  await uploader.uploadFile(path);
-
-  await uploader.uploadFile1(path, authorDocFb);
+  // uploads to fb storage
+  await uploadFileFB(path, sectionDocFb);
 };
 
 module.exports = {
   renderGhostSectionPage,
-  renderGhostAuthorPage,
 };

@@ -1,4 +1,7 @@
-const frametempate = require("../frame/templates");
+const {
+  frame,
+  framefb,
+} = require("../frame/frame_template");
 
 // create post
 const postTemplate = ({
@@ -16,8 +19,6 @@ const postTemplate = ({
     slug,
     profile_image,
   } = primary_author;
-
-  const pageStyle = "post";
 
   const article =`
     <section>
@@ -66,8 +67,8 @@ const postTemplate = ({
     </section>`;
 
   return {
-    postDoc: frametempate.frame(article, path, title, pageStyle),
-    postDocFb: frametempate.framefb(article, path, title, pageStyle),
+    postDoc: frame(article, path, title),
+    postDocFb: framefb(article, path, title),
   };
 };
 

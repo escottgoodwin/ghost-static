@@ -3,6 +3,11 @@ const algoliasearch = require("algoliasearch");
 const functions = require("firebase-functions");
 const moment = require("moment");
 
+const { 
+  log,
+  logError
+ } = require('./utils');
+
 const local = process.env.FUNCTIONS_EMULATOR;
 const collectionName = local ? "ghost_posts_local" : functions.config().algolia.collectionname;
 const appId = functions.config().algolia.id;
@@ -12,15 +17,21 @@ const client = algoliasearch(appId, apiKey);
 
 const index = client.initIndex(collectionName);
 
+const attributesForFaceting = [
+  "primary_author_facet",
+  "mainTag",
+];
+
+// facets for easy filtering of search by post author or section (business/sports...)
 index.setSettings({
-  attributesForFaceting: [
-    "primary_author_facet",
-    "mainTag",
-  ],
+  attributesForFaceting,
 }).then(() => {
   // done
+
+  log(`faceted post ${attributesForFaceting.join(" ")}`);
 });
 
+// indexes newly published or published update post
 const indexPost = async ({
   plaintext,
   title,
@@ -51,7 +62,7 @@ const indexPost = async ({
 
   await index.saveObject(indexPost)
       .then(({objectID}) => {
-        console.log(`Post indexed for ${collectionName}`, objectID);
+        log(`Post indexed for ${collectionName}`, objectID);
       });
 };
 
@@ -60,10 +71,10 @@ const deleteIndexPost = async (id) => {
   await index
       .deleteObject(id)
       .then(() => {
-        console.log(`Post deleted from ${collectionName}`, id);
+        log(`Post deleted from ${collectionName}`, id);
       })
       .catch((error) => {
-        console.error(`Error when deleting contact from ${collectionName}`, error);
+        logError(`Error when deleting contact from ${collectionName}`, error);
         process.exit(1);
       });
 };

@@ -1,1 +1,60 @@
-!function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=0)}([function(e,t){addEventListener("fetch",e=>{e.respondWith(async function(e){if("GET"===e.request.method){let t=await async function(e){const t=new URL(e.request.url),n=caches.default;let r=await n.match(e.request);if(!r){const o="static-times-published";fullUrl="/"===t.pathname?`http://storage.googleapis.com/${o}/front-page.html`:`http://storage.googleapis.com/${o}/${t.pathname}`,r=await fetch(fullUrl);const u={"cache-control":"public, max-age=30, s-maxage=31536000"};r=new Response(r.body,{...r,headers:u}),e.waitUntil(n.put(e.request,r.clone()))}return r}(e);return t.status>399&&(t=new Response(t.statusText,{status:t.status})),t}return new Response("Method not allowed",{status:405})}(e))})}]);
+// deploy - wrangler publish
+addEventListener("fetch", event => {
+    event.respondWith(handleRequest(event))
+  })
+  
+  const BUCKET_URL = `http://storage.googleapis.com`
+  const bucketName = 'html_bucket'
+  const imgbucketName = 'image_bucket'
+  
+  async function serveAsset(event) {
+    const url = new URL(event.request.url);
+    const cache = caches.default
+    //check if route page is already in cache
+    let response = await cache.match(event.request)
+    
+    //if not in cache, get page from google storage, serve it, and put it in the cache
+    if (!response) {
+  
+      // if route is domain root, serve the front page, otherwise serve file from google storage that matches route
+      // route - http://www.example.com/listings.html 
+      // google storage - http://storage.googleapis.com/example-bucket/listings.html
+  
+      // generated images will only have one of these extensions
+      const imagesExt = ['.jpg','.png','webp']
+      const path = url.pathname
+      const imgExt = path.substring(path.lastIndexOf('.'))
+   
+      // check if path has image extension
+      const isImg = imagesExt.includes(imgExt);
+  
+      imgUrl = `${BUCKET_URL}/${imgbucketName}${url.pathname}`
+  
+      htmlUrl = url.pathname==='/' ? `${BUCKET_URL}/${bucketName}/front-page.html` : `${BUCKET_URL}/${bucketName}${url.pathname}`
+      
+      // if img get img from img gcs bucket or if not published html bucket 
+      fullUrl = isImg ? imgUrl : htmlUrl;
+      console.log(fullUrl)
+      //reassign response from the cache response to the response from google storage
+      response = await fetch(fullUrl)
+  
+      //serve and cache response for a year
+      const headers = { "cache-control": "public, max-age=30, s-maxage=31536000" }
+      response = new Response(response.body, { ...response, headers })
+      event.waitUntil(cache.put(event.request, response.clone()))
+    }
+    //if route is in cache, serve the cached page. 
+    return response
+  }
+  
+  async function handleRequest(event) {
+    if (event.request.method === "GET") {
+      let response = await serveAsset(event)
+      if (response.status > 399) {
+        response = new Response(response.statusText, { status: response.status })
+      }
+      return response
+    } else {
+      return new Response("Method not allowed", { status: 405 })
+    }
+  }

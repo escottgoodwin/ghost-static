@@ -31,6 +31,5 @@ const getAuthorDrafts = async (email) => {
 };
 
 module.exports = {
-  knex,
   getAuthorDrafts,
 };

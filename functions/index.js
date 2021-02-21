@@ -1,25 +1,37 @@
 const functions = require("firebase-functions");
 const path = require("path");
-const algolia = require("./algolia");
-const resizeImage = require("./resizeImage");
-const {knex} = require("./mysql");
-const postRender=require("./renderers/post");
-const sectionRender=require("./renderers/section");
-const uploader = require("./renderers/uploader");
-// const sizeImage = require("./sizeImage");
 
-const fbBucketName = functions.config().gcs.fbupload;
+const {resizeImage} = require("./resizeImage");
+
+const {getAuthorDrafts} = require("./mysql");
+
+const {renderGhostSectionPage} = require("./renderers/section");
+
+const {renderGhostAuthorPage} = require("./renderers/author");
 
 const {
-  fbstorage,
-} = require("./firebase");
+  logUpdate,
+  deletePostHtml,
+} = require("./renderers/uploader");
 
-// default firebase functions have 256MB memory and timeout up to 60s
-// depending on the size of your uploaded images, you may need more memory or a longer timeout
-// const runtimeOpts = {
-//   timeoutSeconds: 540,
-//   memory: "2GB",
-// };
+const {
+  indexPost,
+  deleteIndexPost,
+} = require("./algolia");
+
+const {
+  renderUploadGhostDraft,
+  renderUploadGhostPost,
+} = require("./renderers/post");
+
+const { 
+  log,
+  logError
+ } = require('./utils');
+
+const {fbstorage} = require("./firebase");
+
+const fbBucketName = functions.config().gcs.fbupload;
 
 // fires on saved draft, triggers preview update
 exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
@@ -31,9 +43,9 @@ exports.createGhostDraft = functions.https.onRequest(async (req, res) => {
     },
   } = req;
 
-  postRender.renderUploadGhostDraft(current);
+  renderUploadGhostDraft(current);
 
-  uploader.logUpdate(current);
+  logUpdate(current);
 
   res.status(200).send("draft updated");
 });
@@ -48,7 +60,7 @@ exports.updateGhostDraft = functions.https.onRequest(async (req, res) => {
     },
   } = req;
 
-  postRender.renderUploadGhostDraft(current);
+  renderUploadGhostDraft(current);
 
   res.status(200).send("draft updated");
 });
@@ -65,19 +77,19 @@ exports.createGhostPost = functions.https.onRequest(async (req, res) => {
   } = req;
 
   // render and upload post page
-  await postRender.renderUploadGhostPost(current);
+  await renderUploadGhostPost(current);
 
   // render and upload author page
-  await sectionRender.renderGhostAuthorPage(current.primary_author);
+  await renderGhostAuthorPage(current.primary_author);
 
   // update section pages for each tag
   current.tags.forEach(async (tag) => {
-    sectionRender.renderGhostSectionPage(tag);
+    renderGhostSectionPage(tag);
   });
 
-  await algolia.indexPost(current);
+  await indexPost(current);
 
-  uploader.logUpdate(current);
+  logUpdate(current);
 
   res.status(200).send("post created");
 });
@@ -95,16 +107,16 @@ exports.updateGhostPost = functions.https.onRequest(async (req, res) => {
 
   if (current) {
   // render post page
-    await postRender.renderUploadGhostPost(current);
+    await renderUploadGhostPost(current);
 
-    await sectionRender.renderGhostAuthorPage(current.primary_author);
+    await renderGhostAuthorPage(current.primary_author);
 
     // update section pages with associated tags
     current.tags.forEach((tag) => {
-      sectionRender.renderGhostSectionPage(tag);
+      renderGhostSectionPage(tag);
     });
 
-    await algolia.indexPost(current);
+    await indexPost(current);
   }
 
   res.status(200).send("doc updated");
@@ -121,39 +133,41 @@ exports.deleteGhostPost = functions.https.onRequest(async (req, res) => {
     },
   } = req;
 
-  const slug = current.slug;
-  const id = current.id;
-  const tags = current.tags;
+  const {
+    slug,
+    id,
+    tags,
+  } = current;
+
   const path = `${slug}-${id}.html`;
 
   // delete article in storage
-  await uploader.deletePostHtml(path);
+  await deletePostHtml(path);
 
   // update section pages with associated tags removing the article
   tags.forEach(async (tag) => {
-    await sectionRender.renderGhostSectionPage(tag);
+    await renderGhostSectionPage(tag);
   });
 
   // remove from algolia index
-  await algolia.deleteIndexPost(id);
+  await deleteIndexPost(id);
 
-  uploader.logUpdate(current);
+  logUpdate(current);
 
   res.status(200).send("post deleted");
 });
 
 // gets drafts and published posts by logged in author
 exports.getAuthorPosts = functions.https.onCall(async (data, context) => {
-  const email = context.auth.token.email;
+  const {
+    auth: {
+      token: {
+        email,
+      },
+    },
+  } = context;
 
-  const results = await knex.select("p.id", "p.title", "p.slug", "p.status")
-      .from("posts as p")
-      .innerJoin("posts_authors as pa", "p.id", "=", "pa.post_id")
-      .innerJoin("users as u", "u.id", "=", "pa.author_id")
-      .where("u.email", email)
-      .orWhere("p.status", "published")
-      .orWhere("p.status", "draft");
-
+  const results = await getAuthorDrafts(email);
   const drafts = results.filter((d) => d.status === "draft");
   const published = results.filter((d) => d.status === "published");
 
@@ -163,27 +177,31 @@ exports.getAuthorPosts = functions.https.onCall(async (data, context) => {
   };
 });
 
+// create resized images when image is uploaded to gcs through ghost
 exports.generateSizedImages1 = functions.storage.bucket("static-times-media")
     .object()
     .onFinalize(async (object) => {
-      const contentType = object.contentType; // This is the image MIME type
-      const filePath=object.name;
-      const fileExtension = path.extname(filePath);
+      const {
+        contentType,
+        name,
+      } = object;
+
+      const fileExtension = path.extname(name);
 
       if (!contentType) {
-        functions.logger.log("File has no Content-Type, no processing is required");
+        log("File has no Content-Type, no processing is required");
         return;
       }
 
       // filter about a second image version auto generated by ghost
-      if (object.name.includes("_o-")) {
-        console.log(`filtered image ${filePath}`);
+      if (name.includes("_o-")) {
+        log(`filtered image ${name}`);
         return;
       }
 
       // filter about a second image version auto generated by ghost
-      if (object.name.includes("-author-")) {
-        console.log(`filtered image ${filePath}`);
+      if (name.includes("-author")) {
+        log(`filtered image ${name}`);
         return;
       }
 
@@ -235,23 +253,22 @@ exports.generateSizedImages1 = functions.storage.bucket("static-times-media")
       const tasks = [];
 
       imageSizes.forEach((size) => {
-        tasks.push(resizeImage.resizeImage({object, size, convertExt}));
+        tasks.push(resizeImage({object, size, convertExt}));
       });
       const results = await Promise.all(tasks);
 
       const failed = results.some((result) => result.success === false);
 
       if (failed) {
-        functions.logger.error("Failed execution of extension");
+        logError("Failed execution of extension");
         return;
       } else {
-        functions.logger.log("Completed image resizing");
+        log("Completed image resizing");
+        return;
       }
-
-      return "images generated";
     });
 
-
+// fetches html from storage to serve to client
 exports.expressHandler = functions.https.onRequest(async (req, res) => {
   const fileName = req.path === "/" ? "front-page.html" : req.path.replace("/", "");
 
@@ -265,10 +282,10 @@ exports.expressHandler = functions.https.onRequest(async (req, res) => {
   });
   rs.pipe(res);
   rs.on("finish", () => {
-    functions.logger.log("file stream took", Date.now() - t0, "ms");
+    log("file stream took", Date.now() - t0, "ms");
   });
   rs.on("error", (err) => {
-    functions.logger.error(err);
+    logError(err);
     res.status(404).send("Not Found");
   });
 });

@@ -1,11 +1,18 @@
 const fetch = require("node-fetch");
 const fs = require("fs");
 const {Storage} = require("@google-cloud/storage");
+
+const { 
+  log,
+  logError
+ } = require('../utils');
+
 const {
   db,
   fbstorage,
   functions,
 } = require("../firebase");
+const { logError } = require("../util");
 
 const storage = new Storage();
 
@@ -15,14 +22,15 @@ const cfZoneId = functions.config().cloudflare.zoneid;
 const cfEmail = functions.config().cloudflare.email;
 const bucketName = local ? functions.config().gcs.cfuploadlocal : functions.config().gcs.cfupload;
 const fbBucketName = functions.config().gcs.fbupload;
-const siteUrl = functions.config().cdn.url;
+const siteUrl = functions.config().site.url;
+const fbsiteUrl = functions.config().site.fburl;
 
 const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`;
 
-const ORIGIN = "https://static-times.web.app";
-
 const bucket = storage.bucket(bucketName);
 
+// updates author item in fb database when article is updated that they are an author for
+// triggers update of preview posts list - shifts from drafts to published or vice versa
 const logUpdate = (current) => {
   const {
     authors,
@@ -38,15 +46,15 @@ const logUpdate = (current) => {
       updated: now,
       title,
     });
-    console.log(`${title} updated in db for ${email}`);
+    log(`${title} updated in db for ${email}`);
   });
 };
 
-// update realtime database
+// update realtime database to trigger preview reload
 const updateFBDoc = (fileName) => {
   const fbpath = fileName.replace(".html", "");
   const now = Date.now();
-  console.log(`${fbpath} added to db`);
+  log(`${fbpath} added to db`);
   db.ref(fbpath).set({
     url: fileName,
     timestamp: now.toString(),
@@ -58,7 +66,7 @@ const writeHtml = (path, newDoc) => {
   const filepath = `/tmp/${path}`;
   fs.writeFile(filepath, newDoc, (err) => {
     if (err) throw err;
-    console.log(`${filepath} Saved!`);
+    log(`${filepath} Saved!`);
   });
 };
 
@@ -67,7 +75,7 @@ const deleteHtml = (path) => {
   const filepath = `/tmp/${path}`;
   fs.unlink(filepath, (err) => {
     if (err) throw err;
-    console.log(`successfully deleted ${filepath}`);
+    log(`successfully deleted ${filepath}`);
   });
 };
 
@@ -76,7 +84,7 @@ const deleteHtml = (path) => {
 // all subsequent requests for url will come directly from the cache for the next year
 // until page is updated and cache is purged
 
-const uploadFile1 = async (path, doc) => {
+const uploadFileFB = async (path, doc) => {
   await storage
       .bucket(fbBucketName)
       .file(path)
@@ -88,23 +96,25 @@ const uploadFile1 = async (path, doc) => {
         },
       });
 
-  console.log(`${path} uploaded fb`);
+  log(`${path} uploaded fb`);
 
+  // trigger render reload in preview
   updateFBDoc(path);
 
-  const purgeUrl = `${ORIGIN}/${path}`;
+  // purge cache for path in fb hosting - http://www.example.com/business.html
+  const purgeUrl = `${fbsiteUrl}${path}`;
   await fetch(purgeUrl, {method: "PURGE"});
-  console.log(`purged fb ${purgeUrl }`);
+  log(`purged fb ${purgeUrl }`);
+
+  // if page uploaded in front-page, also purge fb hosting root url http://www.example.com/
   if (path === "front-page.html") {
-    const purgeRoot = `${ORIGIN}/`;
-    await fetch(purgeRoot, {method: "PURGE"});
-    console.log(`purged fb ${purgeRoot}`);
+    await fetch(fbsiteUrl, {method: "PURGE"});
+    log(`purged fb ${fbsiteUrl}`);
   }
-
-
   return;
 };
 
+// uploads to google storage, updates fb database to trigger preview update and purges cloudflare cache
 const uploadFile = async (path) => {
   const filepath = `/tmp/${path}`;
   try {
@@ -115,13 +125,13 @@ const uploadFile = async (path) => {
         cacheControl: "max-age=0, s-maxage=31536000",
       },
     });
-    console.log(`${path} uploaded`);
+    log(`${path} uploaded`);
 
     updateFBDoc(path);
 
     return await purgeUrl(path);
   } catch (error) {
-    console.log(error);
+    logError(error);
   }
 };
 
@@ -136,8 +146,8 @@ const uploadDraft = async (path, doc) => {
         },
       }).then((res) => {
         updateFBDoc(path);
-      }).catch((e) => {
-        console.log(e);
+      }).catch((error) => {
+        logError(error);
       });
 };
 
@@ -160,7 +170,7 @@ const purgeUrl = async (path) => {
     },
     method: "POST",
   });
-  console.log(`${purgeUrl} cf purged`);
+  log(`${purgeUrl} cf purged`);
   return response;
 };
 
@@ -168,7 +178,7 @@ const purgeUrl = async (path) => {
 const deletePostHtml = async (path) => {
   await bucket.file(path).delete();
   await bucket.file(fbBucketName).delete();
-  console.log(`${path} deleted`);
+  log(`${path} deleted`);
   return await purgeUrl(path);
 };
 
@@ -180,6 +190,5 @@ module.exports = {
   writeHtml,
   deleteHtml,
   logUpdate,
-  uploadFile1,
-
+  uploadFileFB,
 };

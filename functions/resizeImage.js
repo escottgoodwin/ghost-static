@@ -5,10 +5,12 @@ const os = require("os");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 
+const { logError } = require("./util");
+
 sharp.cache(false);
 
 // bucket name where we upload the resized images4
-const publicUploadBucket = functions.config().gcs.publicupload;
+const publicUploadBucket = functions.config().gcs.publicmediaupload;
 
 // intialize Cloud Storage client
 const gcs = new Storage();
@@ -56,13 +58,11 @@ const supportedImageContentTypeMap = {
   webp: "image/webp",
 };
 
+
 const resizeImage = async ({object, size, convertExt}) => {
   const filePath = object.name; // File path in the bucket.
   const width = size.width;
   const name = size.name;
-
-  const fileDir = path.dirname(filePath);
-  console.log(fileDir);
 
   const fileExtension = path.extname(filePath); // .jpg for image_to_resize.jpg
   const fileNameWithoutExtension = extractFileNameWithoutExtension(filePath, fileExtension); // image_to_resize for image_to_resize.jpg
@@ -82,8 +82,7 @@ const resizeImage = async ({object, size, convertExt}) => {
   const modifiedFileName = `${fileNameWithoutExtension}_${name}${modifiedExtensionName}`;
 
   // full path of resized image with original director
-  const modifiedFilePath = modifiedFileName;
-  console.log(modifiedFilePath);
+  const modifiedFilePath = `gen_images/${modifiedFileName}`;
 
   const bucket = gcs.bucket(object.bucket);
 
@@ -133,7 +132,7 @@ const resizeImage = async ({object, size, convertExt}) => {
 
     return {size, success: true};
   } catch (err) {
-    functions.logger.error(`${size} ${err}`);
+    logError(`${size} ${err}`);
 
     return {size, success: false};
   } finally {
@@ -143,7 +142,7 @@ const resizeImage = async ({object, size, convertExt}) => {
         fs.unlinkSync(modifiedFile);
       }
     } catch (err) {
-      functions.logger.error(`${err}`);
+      logError(`${err}`);
     }
   }
 };

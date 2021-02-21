@@ -1,51 +1,18 @@
-const frameTemplate = require("../frame/templates");
+const functions = require("firebase-functions");
 
-const baseurl = "https://storage.googleapis.com/ghost-public-media/";
+const { 
+    imageExt, 
+    resizedImageUrl,
+} = require("../../util");
 
-// generate author
-const authorTemplate = ({
-  name,
-  profile_image,
-  posts,
-  path,
-}) => {
-  const pageStyle = "section";
+const {
+  frame,
+  framefb,
+} = require("../frame/frame_template");
 
-  const postlist = posts.length>0 ? posts.map((p) => postLink(p)).join("") : "<div></div>";
+const url = functions.config().site.url;
 
-  const postCount = posts.length === 1 ? `${posts.length} post` : `${posts.length} posts`;
-
-  const template = `
-        <header class="author-header">
-            <img class="author-profile-image" src="${profile_image}" alt="${name}" />
-            <h1>
-                <a href="${path}">
-                    ${name}
-                </a>
-            </h1>
-            <div class="author-meta">
-                <div class="author-stats">
-                    ${postCount} <span class="bull">&bull;</span>
-                </div>
-                <a href="https://feedly.com/i/subscription/feed/https://editorial.ghost.io/author/team/rss/" class="icon fa-rss" target="_blank" rel="noopener">
-                    <span class="label" title="RSS">
-                        RSS
-                    </span>
-                </a>
-            </div>
-        </header>
-        <section class="posts">
-            ${postlist}
-        </section>
-        <footer>
-        </footer>
-    `;
-
-  return {
-    authorDoc: frameTemplate.frame(template, path, name, pageStyle),
-    authorDocFb: frameTemplate.framefb(template, path, name, pageStyle),
-  };
-};
+const baseurl = `${url}gen_images/`;
 
 // generate section
 const sectionTemplate = ({
@@ -53,8 +20,6 @@ const sectionTemplate = ({
   posts,
   path,
 }) => {
-  const pageStyle = "section";
-
   const postlist = posts.length>0 ? posts.slice(1).map((p) => postLink(p)).join("") : "<div></div>";
 
   const featuredPost1 = posts.length>0 ? featuredPost(posts[0]) : "<div></div>";
@@ -76,8 +41,8 @@ const sectionTemplate = ({
     `;
 
   return {
-    sectionDoc: frameTemplate.frame(template, path, name, pageStyle),
-    sectionDocFb: frameTemplate.framefb(template, path, name, pageStyle),
+    sectionDoc: frame(template, path, name),
+    sectionDocFb: framefb(template, path, name),
   };
 };
 
@@ -90,13 +55,10 @@ const postLink = ({
 }) => {
   const url = `${id}.html`;
 
-  const rootImageUrl = feature_image ? feature_image.slice(0, feature_image.lastIndexOf(".")).slice(feature_image.lastIndexOf("/")+1) : "";
-
-  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
-  const imgExtension = feature_image ? feature_image.slice(feature_image.lastIndexOf(".")) : "";
-
-  // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
-  const fullUrl = baseurl + rootImageUrl;
+    // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
+    const fullUrl = resizedImageUrl(feature_image);
+    // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+    const imgExtension = imageExt(feature_image);
 
   return `
         <article>
@@ -145,13 +107,10 @@ const featuredPost = ({
 }) => {
   const url = `${id}.html`;
 
-  const rootImageUrl = feature_image ? feature_image.slice(0, feature_image.lastIndexOf(".")).slice(feature_image.lastIndexOf("/")+1) : "";
-
-  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
-  const imgExtension = feature_image ? feature_image.slice(feature_image.lastIndexOf(".")) : "";
-
-  // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
-  const fullUrl = baseurl + rootImageUrl;
+// get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
+const fullUrl = resizedImageUrl(feature_image);
+// get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+const imgExtension = imageExt(feature_image);
 
   return `
     <article id="banner">
@@ -196,6 +155,6 @@ const featuredPost = ({
 };
 
 module.exports = {
-  authorTemplate,
   sectionTemplate,
+  postLink,
 };

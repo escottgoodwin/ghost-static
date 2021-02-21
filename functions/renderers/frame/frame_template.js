@@ -1,5 +1,4 @@
 const functions = require("firebase-functions");
-// const fs = require("fs");
 
 const siteTitle = functions.config().site.sitetitle;
 const gh_cdn_url = functions.config().site.ghcdnurl;
@@ -39,12 +38,6 @@ const tags = [
   },
 ];
 
-// const renderCss = (pageStyle) => {
-//   const frameCss = fs.readFileSync(`${__dirname}/css/frame.css`, {encoding: "utf8"});
-//   const pageCss = fs.readFileSync(`${__dirname}/css/${pageStyle}.css`, {encoding: "utf8"});
-//   return frameCss + pageCss;
-// };
-
 // links on sidebar
 const pageLink = ({slug, name}) => `<li class="nav-home active"><a href="${slug}.html">${name}</a></li>`;
 
@@ -56,11 +49,8 @@ const frame = (
     content,
     path,
     pageTitle,
-    pageStyle,
 ) => {
   const menu = pagesMenu(tags);
-
-  // const fullCss = renderCss(pageStyle);
 
   return `
         <!DOCTYPE html>
@@ -75,7 +65,7 @@ const frame = (
 
                 <link rel="shortcut icon" href="${favicon}">
                 <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
-
+                
                 <meta name="description" content="${description}" />
                 <link rel="canonical" href="${url}${path}" />
                 <meta name="referrer" content="no-referrer-when-downgrade" />
@@ -177,11 +167,8 @@ const framefb = (
     content,
     path,
     pageTitle,
-    pageStyle
 ) => {
   const menu = pagesMenu(tags);
-
-  // const fullCss = renderCss(pageStyle);
 
   return `
         <!DOCTYPE html>
