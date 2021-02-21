@@ -1,18 +1,12 @@
-const functions = require("firebase-functions");
-
-const { 
-    imageExt, 
-    resizedImageUrl,
+const {
+  imageExt,
+  resizedImageUrl,
 } = require("../../util");
 
 const {
   frame,
   framefb,
 } = require("../frame/frame_template");
-
-const url = functions.config().site.url;
-
-const baseurl = `${url}gen_images/`;
 
 // generate section
 const sectionTemplate = ({
@@ -55,10 +49,10 @@ const postLink = ({
 }) => {
   const url = `${id}.html`;
 
-    // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
-    const fullUrl = resizedImageUrl(feature_image);
-    // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
-    const imgExtension = imageExt(feature_image);
+  // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
+  const fullUrl = resizedImageUrl(feature_image);
+  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+  const imgExtension = imageExt(feature_image);
 
   return `
         <article>
@@ -107,10 +101,10 @@ const featuredPost = ({
 }) => {
   const url = `${id}.html`;
 
-// get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
-const fullUrl = resizedImageUrl(feature_image);
-// get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
-const imgExtension = imageExt(feature_image);
+  // get full public image root (wihtout) extension - https://storage.googleapis.com/ghost-public-media/image-file
+  const fullUrl = resizedImageUrl(feature_image);
+  // get the extension for the file - from 2021/2/1/image-file.jpg => .jpg
+  const imgExtension = imageExt(feature_image);
 
   return `
     <article id="banner">

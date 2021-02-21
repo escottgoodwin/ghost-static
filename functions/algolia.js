@@ -3,10 +3,10 @@ const algoliasearch = require("algoliasearch");
 const functions = require("firebase-functions");
 const moment = require("moment");
 
-const { 
+const {
   log,
-  logError
- } = require('./utils');
+  logError,
+} = require("./util");
 
 const local = process.env.FUNCTIONS_EMULATOR;
 const collectionName = local ? "ghost_posts_local" : functions.config().algolia.collectionname;

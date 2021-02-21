@@ -2,17 +2,16 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const {Storage} = require("@google-cloud/storage");
 
-const { 
+const {
   log,
-  logError
- } = require('../utils');
+  logError,
+} = require("../util");
 
 const {
   db,
   fbstorage,
   functions,
 } = require("../firebase");
-const { logError } = require("../util");
 
 const storage = new Storage();
 

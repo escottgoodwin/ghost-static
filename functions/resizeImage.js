@@ -5,7 +5,7 @@ const os = require("os");
 const path = require("path");
 const {Storage} = require("@google-cloud/storage");
 
-const { logError } = require("./util");
+const {logError} = require("./util");
 
 sharp.cache(false);
 

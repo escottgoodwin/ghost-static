@@ -24,10 +24,10 @@ const {
   renderUploadGhostPost,
 } = require("./renderers/post");
 
-const { 
+const {
   log,
-  logError
- } = require('./utils');
+  logError,
+} = require("./util");
 
 const {fbstorage} = require("./firebase");
 

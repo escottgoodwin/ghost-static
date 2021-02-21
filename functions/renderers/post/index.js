@@ -1,4 +1,3 @@
-const functions = require("firebase-functions");
 const moment = require("moment");
 const {postTemplate} = require("./post_template");
 
@@ -9,8 +8,8 @@ const {
   uploadDraft,
 } = require("../uploader");
 
-const { 
-  imageExt, 
+const {
+  imageExt,
   resizedImageUrl,
 } = require("../../util");
 
