@@ -64,7 +64,7 @@ const frame = (
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
                 <link rel="shortcut icon" href="${favicon}">
-                <link rel="stylesheet" type="text/css" href="/assets/css/main.css" />
+                <link rel="stylesheet" type="text/css" href="${url}assets/css/main.css" />
                 
                 <meta name="description" content="${description}" />
                 <link rel="canonical" href="${url}${path}" />
@@ -74,7 +74,7 @@ const frame = (
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="${url}" />
                 <meta property="og:description" content="${description}" />
-                <meta property="og:url" content="${url}/" />
+                <meta property="og:url" content="${url}" />
                 <meta property="article:publisher" content="${facebook}" />
                 <meta name="twitter:card" content="summary" />
                 <meta name="twitter:title" content="${siteTitle}" />
@@ -100,7 +100,7 @@ const frame = (
                     "url": "${url}/",
                     "mainEntityOfPage": {
                         "@type": "WebPage",
-                        "@id": "${url}/"
+                        "@id": "${url}"
                     },
                     "description": "${description}"
                 }
@@ -153,11 +153,11 @@ const frame = (
                 </div>
             </div>
 
-            <script src="/assets/js/jquery-3.5.1.min.js"></script>
-            <script src="/assets/js/browser.min.js"></script>
-            <script src="/assets/js/breakpoints.min.js"></script>
-            <script src="/assets/js/util.js"></script>
-            <script src="/assets/js/main.js"></script>
+            <script src="${url}assets/js/jquery-3.5.1.min.js"></script>
+            <script src="${url}assets/js/browser.min.js"></script>
+            <script src="${url}assets/js/breakpoints.min.js"></script>
+            <script src="${url}assets/js/util.js"></script>
+            <script src="${url}assets/js/main.js"></script>
         </body>
     </html>
     `;
@@ -297,11 +297,11 @@ const framefb = (
               var perf = firebase.performance();
             </script>
 
-            <script src="/assets/js/jquery-3.5.1.min.js"></script>
-            <script src="/assets/js/browser.min.js"></script>
-            <script src="/assets/js/breakpoints.min.js"></script>
-            <script src="/assets/js/util.js"></script>
-            <script src="/assets/js/main.js"></script>
+            <script src="${fburl}assets/js/jquery-3.5.1.min.js"></script>
+            <script src="${fburl}assets/js/browser.min.js"></script>
+            <script src="${fburl}assets/js/breakpoints.min.js"></script>
+            <script src="${fburl}assets/js/util.js"></script>
+            <script src="${fburl}assets/js/main.js"></script>
         </body>
     </html>
     `;

@@ -75,9 +75,6 @@ const renderUploadGhostDraft = async (post)=> {
   const {postDoc} = renderGhostPost(post);
   // write render upload to storage
   uploadDraft(path, postDoc, name, email);
-
-
-  // delete temp rendered html file
 };
 
 module.exports = {

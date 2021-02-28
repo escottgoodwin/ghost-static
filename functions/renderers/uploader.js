@@ -27,6 +27,7 @@ const fbsiteUrl = functions.config().site.fburl;
 const cloudframeurl = `https://api.cloudflare.com/client/v4/zones/${cfZoneId}/purge_cache`;
 
 const bucket = storage.bucket(bucketName);
+const fbBucket = storage.bucket(fbBucketName);
 
 // updates author item in fb database when article is updated that they are an author for
 // triggers update of preview posts list - shifts from drafts to published or vice versa
@@ -69,23 +70,19 @@ const writeHtml = (path, newDoc) => {
   });
 };
 
-// deletes temporary file
-const deleteHtml = (path) => {
-  const filepath = `/tmp/${path}`;
-  fs.unlink(filepath, (err) => {
-    if (err) throw err;
-    log(`successfully deleted ${filepath}`);
-  });
-};
-
 // uploads to google storage from temporary file and purges cloudflare cache
 // sets browser cache for 0 seconds and the cloudflare cache for a year -
 // all subsequent requests for url will come directly from the cache for the next year
 // until page is updated and cache is purged
 
+const purgeFb = async (path) => {
+  const purgeUrl = `${fbsiteUrl}${path}`;
+  await fetch(purgeUrl, {method: "PURGE"});
+  return log(`purged fb ${path}`);
+};
+
 const uploadFileFB = async (path, doc) => {
-  await storage
-      .bucket(fbBucketName)
+  await fbBucket
       .file(path)
       .save(doc, {
         gzip: true,
@@ -101,9 +98,7 @@ const uploadFileFB = async (path, doc) => {
   updateFBDoc(path);
 
   // purge cache for path in fb hosting - http://www.example.com/business.html
-  const purgeUrl = `${fbsiteUrl}${path}`;
-  await fetch(purgeUrl, {method: "PURGE"});
-  log(`purged fb ${purgeUrl }`);
+  await purgeFb(path);
 
   // if page uploaded in front-page, also purge fb hosting root url http://www.example.com/
   if (path === "front-page.html") {
@@ -174,11 +169,16 @@ const purgeUrl = async (path) => {
 };
 
 // deletes html file from google storage when unpublished and purges from cloudflare cache
-const deletePostHtml = async (path) => {
+const deletePostHtml = async (id) => {
+  const path = `${id}.html`;
+  // delete from cf gcs bucket
   await bucket.file(path).delete();
-  await bucket.file(fbBucketName).delete();
-  log(`${path} deleted`);
-  return await purgeUrl(path);
+  log(`${path} deleted from cf`);
+  await purgeUrl(path);
+  // delete from fb hosting bucket
+  await fbBucket.file(path).delete();
+  log(`${path} deleted from fb`);
+  return await purgeFb(path);
 };
 
 module.exports = {
@@ -187,7 +187,6 @@ module.exports = {
   purgeUrl,
   deletePostHtml,
   writeHtml,
-  deleteHtml,
   logUpdate,
   uploadFileFB,
 };

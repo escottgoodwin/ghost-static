@@ -22,15 +22,6 @@ const attributesForFaceting = [
   "mainTag",
 ];
 
-// facets for easy filtering of search by post author or section (business/sports...)
-index.setSettings({
-  attributesForFaceting,
-}).then(() => {
-  // done
-
-  log(`faceted post ${attributesForFaceting.join(" ")}`);
-});
-
 // indexes newly published or published update post
 const indexPost = async ({
   plaintext,
@@ -42,6 +33,14 @@ const indexPost = async ({
   primary_author,
   tags,
 }) => {
+  // facets for easy filtering of search by post author or section (business/sports...)
+  index.setSettings({
+    attributesForFaceting,
+  }).then(() => {
+  // done
+    log(`faceted post ${attributesForFaceting.join(" ")}`);
+  });
+
   const indexPost = {
     objectID: id,
     plaintext,
